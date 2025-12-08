@@ -30,6 +30,11 @@ OP_TYPES = [
     "$or",
     "$not",
     "$mul",
+    "$ge",
+    "$mux",
+    "$reduce_bool",
+    "$sub",
+    "$xor",
     "UNKNOWN",
 ]
 OP_INDEX = {op_type: i for i, op_type in enumerate(OP_TYPES)}
@@ -44,6 +49,11 @@ COLOR_MAP = {
     "$or": "#66CDAA",  # medium aquamarine
     "$not": "#FF69B4",  # hot pink
     "$mul": "#FFDAB9",  # peach puff
+    "$ge": "#E6E6FA",  # lavender
+    "$mux": "#DDA0DD",  # plum
+    "$reduce_bool": "#F0E68C",  # khaki
+    "$sub": "#B0C4DE",  # light steel blue
+    "$xor": "#FFE4B5",  # moccasin
     "UNKNOWN": "#D3D3D3",  # light gray
 }
 
