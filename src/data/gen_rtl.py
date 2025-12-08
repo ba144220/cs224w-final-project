@@ -1,3 +1,5 @@
+"""Random RTL generator."""
+
 import random
 
 
@@ -48,7 +50,7 @@ class RandomRTLGenerator:
         """Return True with given probability."""
         return random.random() < prob
 
-    def get_random_width(self, min_w=1, max_w=64):
+    def get_random_width(self, min_w=1, max_w=32):
         """Get a random bit width."""
         return random.randint(min_w, max_w)
 
@@ -167,12 +169,25 @@ class RandomRTLGenerator:
             else:
                 expr = f"$unsigned({expr})"
 
-        return expr, width
+        additional_lines = []
+
+        # Truncate or extend to target width
+        if width > target_width and self.prob_event(self.config["outtrunc_prob"]):
+            # Add a line
+            temp_name = f"expr_{random.randint(0, 1000000)}"
+            additional_lines.append(f"    logic [{width-1}:0] {temp_name};")
+            additional_lines.append(f"    assign {temp_name} = {expr};")
+            expr = f"{temp_name}[{target_width-1}:0]"
+        elif width < target_width and self.prob_event(self.config["outlong_prob"]):
+            pad = target_width - width
+            expr = f"{{{pad}'b0, {expr}}}"
+
+        return expr, width, additional_lines
 
     def generate_rtl(self):
         """Generate the complete random RTL module."""
         lines = []
-        lines.append(f"module random_rtl (")
+        lines.append(f"module top (")
         lines.append(f"    input [{self.inp_width-1}:0] input_data,")
         lines.append(f"    output [{self.out_width-1}:0] output_data")
         lines.append(f");")
@@ -196,15 +211,25 @@ class RandomRTLGenerator:
             # Conditional assignment - only use previously defined temps
             if self.prob_event(self.config["conditional_prob"]):
                 cond, _ = self.get_operand(1, only_defined=True)
-                expr_true, _ = self.generate_expression(target_width, only_defined=True)
-                expr_false, _ = self.generate_expression(
+                expr_true, _, additional_lines_true = self.generate_expression(
                     target_width, only_defined=True
                 )
+                expr_false, _, additional_lines_false = self.generate_expression(
+                    target_width, only_defined=True
+                )
+                for line in additional_lines_true:
+                    lines.append(line)
+                for line in additional_lines_false:
+                    lines.append(line)
                 lines.append(
                     f"    assign {temp} = {cond} ? {expr_true} : {expr_false};"
                 )
             else:
-                expr, _ = self.generate_expression(target_width, only_defined=True)
+                expr, _, additional_lines = self.generate_expression(
+                    target_width, only_defined=True
+                )
+                for line in additional_lines:
+                    lines.append(line)
                 lines.append(f"    assign {temp} = {expr};")
 
             # Mark this temp as defined for subsequent assignments
@@ -216,13 +241,25 @@ class RandomRTLGenerator:
         # Conditional assignment - only use previously defined temps
         if self.prob_event(self.config["conditional_prob"]):
             cond, _ = self.get_operand(1, only_defined=True)
-            expr_true, _ = self.generate_expression(target_width, only_defined=True)
-            expr_false, _ = self.generate_expression(target_width, only_defined=True)
+            expr_true, _, additional_lines_true = self.generate_expression(
+                target_width, only_defined=True
+            )
+            expr_false, _, additional_lines_false = self.generate_expression(
+                target_width, only_defined=True
+            )
+            for line in additional_lines_true:
+                lines.append(line)
+            for line in additional_lines_false:
+                lines.append(line)
             lines.append(
                 f"    assign output_data = {cond} ? {expr_true} : {expr_false};"
             )
         else:
-            expr, _ = self.generate_expression(target_width, only_defined=True)
+            expr, _, additional_lines = self.generate_expression(
+                target_width, only_defined=True
+            )
+            for line in additional_lines:
+                lines.append(line)
             lines.append(f"    assign output_data = {expr};")
 
         lines.append("")
@@ -251,7 +288,7 @@ if __name__ == "__main__":
         "compare_prob": 0.1,
         "conditional_prob": 0.15,
         "shift_prob": 0.1,
-        "random_seed": 0,
+        "random_seed": 1,
     }
 
     generator = RandomRTLGenerator(config)

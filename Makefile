@@ -1,6 +1,6 @@
 DESIGN_ID = 1
 DESIGN_DIR = designs
-CONFIG_FILE = designs/config.tcl
+CONFIG_FILE = ./config.tcl
 
 OPENLANE_DESIGN_DIR = third_party/OpenLane/designs/$(DESIGN_ID)
 
