@@ -31,5 +31,4 @@ designs/
 3. Run `make run DESIGN_ID=<test_case_id>` to run the OpenLane flow. The PPA metrics will be saved in `designs/<test_case_id>/metrics.csv`
 4. Run `python3 src/data/gen_net.py` to generate the netlist for the design. Remember to change the design ID in the script.
 5. (Optional) Run `python3 src/utils/view_net.py` to view the netlist. Remember to change the design ID in the script.
-6. Run `python3 src/data/net_to_graph.py` to convert the netlist to a PyG graph. Remember to change the design ID in the script.
-7. The graph will be saved in `designs/<test_case_id>/graph.png`
+6. Run `python3 src/data/net_to_graph.py` to convert the netlist to a PyG graph. Remember to change the design ID in the script. The graph will be saved in `designs/<test_case_id>/graph.png`
