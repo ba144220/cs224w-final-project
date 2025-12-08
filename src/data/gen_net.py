@@ -2,6 +2,7 @@
 Generate the netlist of the design using Yosys.
 """
 
+import argparse
 import os
 import subprocess
 
@@ -60,4 +61,18 @@ def synthesize_with_yosys(sv_file: str, output_file: str) -> None:
 
 
 if __name__ == "__main__":
-    synthesize_with_yosys("designs/0/top.sv", "designs/0/net.json")
+    parser = argparse.ArgumentParser(
+        description="Run Yosys synthesis for a specific design id."
+    )
+    parser.add_argument(
+        "--id",
+        required=True,
+        help="Design identifier used to locate the design directory (e.g., 0).",
+    )
+    args = parser.parse_args()
+
+    design_dir = os.path.join("designs", args.id)
+    sv_path = os.path.join(design_dir, "top.sv")
+    net_out = os.path.join(design_dir, "net.json")
+
+    synthesize_with_yosys(sv_path, net_out)

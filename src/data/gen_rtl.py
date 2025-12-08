@@ -1,6 +1,31 @@
 """Random RTL generator."""
 
 import random
+import numpy as np
+
+
+def resolve_config(config_candidates):
+    """
+    Resolve a config dict that may contain candidate lists/tuples.
+
+    Each value can be:
+    - A scalar: used directly.
+    - A non-empty list/tuple: one element is chosen uniformly at random.
+    - A numpy array: converted to a list and then sampled uniformly.
+    """
+    resolved = {}
+    for key, value in config_candidates.items():
+        # Convert numpy arrays to lists for sampling
+        if isinstance(value, np.ndarray):
+            value = value.tolist()
+
+        if isinstance(value, (list, tuple)):
+            if not value:
+                raise ValueError(f"Config entry '{key}' has an empty candidate list.")
+            resolved[key] = random.choice(value)
+        else:
+            resolved[key] = value
+    return resolved
 
 
 class RandomRTLGenerator:
@@ -46,6 +71,8 @@ class RandomRTLGenerator:
         self.used_input_bits = set()
         # self.defined_output_bits = set()
 
+        self.now_tmp_id = 0
+
     def prob_event(self, prob):
         """Return True with given probability."""
         return random.random() < prob
@@ -54,7 +81,7 @@ class RandomRTLGenerator:
         """Get a random bit width."""
         return random.randint(min_w, max_w)
 
-    def get_operand(self, current_width=None, force_input=False, only_defined=False):
+    def get_operand(self, current_width=None, force_input=False, only_defined=False, no_input=False):
         """Generate a random operand (input bit slice, temp, or constant)."""
         if current_width is None:
             current_width = self.get_random_width()
@@ -67,7 +94,10 @@ class RandomRTLGenerator:
         available_temps = self.defined_temps if only_defined else self.temps
 
         # Decide operand type
-        if available_temps and self.prob_event(self.config["temp_prob"]):
+        if no_input or (available_temps and self.prob_event(
+            self.config["temp_prob"] + (1 - self.config["temp_prob"]) * self.now_tmp_id / self.config["num_temps"]
+            )
+        ):
             # Use a temporary
             temp = random.choice(available_temps)
             temp_width = self.temp_widths[temp]
@@ -114,7 +144,7 @@ class RandomRTLGenerator:
             else:
                 return f"input_data[{high}:{low}]", width
 
-    def generate_expression(self, target_width, force_input=False, only_defined=False):
+    def generate_expression(self, target_width, force_input=False, only_defined=False, no_input=False):
         """Generate a random combinational expression."""
         num_terms = random.randint(1, self.config["num_terms"])
 
@@ -130,7 +160,7 @@ class RandomRTLGenerator:
 
         # Start with first operand
         expr, width = self.get_operand(
-            target_width, force_input=force_input, only_defined=only_defined
+            target_width, force_input=force_input, only_defined=only_defined, no_input=no_input
         )
 
         for i in range(num_terms - 1):
@@ -138,7 +168,7 @@ class RandomRTLGenerator:
             # Force at least one input usage per expression
             use_input = force_input and (i == 0 or random.random() < 0.3)
             operand, op_width = self.get_operand(
-                target_width, force_input=use_input, only_defined=only_defined
+                target_width, force_input=use_input, only_defined=only_defined, no_input=no_input
             )
 
             # Handle signed/unsigned mixing
@@ -206,6 +236,7 @@ class RandomRTLGenerator:
 
         # Generate assignments for temporaries
         for temp in self.temps:
+            self.now_tmp_id += 1
             target_width = self.temp_widths[temp]
 
             # Conditional assignment - only use previously defined temps
@@ -240,12 +271,12 @@ class RandomRTLGenerator:
         target_width = self.out_width
         # Conditional assignment - only use previously defined temps
         if self.prob_event(self.config["conditional_prob"]):
-            cond, _ = self.get_operand(1, only_defined=True)
+            cond, _ = self.get_operand(1, only_defined=True, no_input=True)
             expr_true, _, additional_lines_true = self.generate_expression(
-                target_width, only_defined=True
+                target_width, only_defined=True, no_input=True
             )
             expr_false, _, additional_lines_false = self.generate_expression(
-                target_width, only_defined=True
+                target_width, only_defined=True, no_input=True
             )
             for line in additional_lines_true:
                 lines.append(line)
@@ -256,7 +287,7 @@ class RandomRTLGenerator:
             )
         else:
             expr, _, additional_lines = self.generate_expression(
-                target_width, only_defined=True
+                target_width, only_defined=True, no_input=True
             )
             for line in additional_lines:
                 lines.append(line)
@@ -270,28 +301,31 @@ class RandomRTLGenerator:
 
 # Example usage
 if __name__ == "__main__":
-    config = {
-        "num_temps": 5,
-        "num_terms": 4,
-        "temp_prob": 0.15,
-        "const_prob": 0.1,
-        "negconst_prob": 0.1,
-        "negation_prob": 0.1,
-        "inp_width": 16,
-        "out_width": 32,
-        "mixed_prob": 0.3,
-        "outtrunc_prob": 0.1,
-        "outlong_prob": 0.1,
-        "lowertrunc_prob": 0.1,
-        "uppertrunc_prob": 0.1,
-        "typecast_prob": 0.2,
-        "compare_prob": 0.1,
-        "conditional_prob": 0.15,
-        "shift_prob": 0.1,
-        "random_seed": 1,
+    # Fill each entry with either a single value or a list/tuple of candidates.
+    # If a list/tuple is provided, one candidate will be chosen uniformly at random.
+    config_candidates = {
+        "num_temps": np.arange(5, 20, 1),
+        "num_terms": np.arange(3, 15, 1),
+        "temp_prob": np.arange(0.3, 0.8, 0.01),
+        "const_prob": np.arange(0, 0.2, 0.01),
+        "negconst_prob": np.arange(0, 0.2, 0.01),
+        "negation_prob": np.arange(0, 0.2, 0.01),
+        "inp_width": np.arange(3, 16, 1),
+        "out_width": np.arange(1, 64, 1),
+        "mixed_prob": np.arange(0, 1, 0.1),
+        "outtrunc_prob": np.arange(0, 0.2, 0.01),
+        "outlong_prob": np.arange(0, 0.2, 0.01),
+        "lowertrunc_prob": np.arange(0, 0.2, 0.01),
+        "uppertrunc_prob": np.arange(0, 0.2, 0.01),
+        "typecast_prob": np.arange(0, 0.5, 0.05),
+        "compare_prob": np.arange(0, 0.2, 0.01),
+        "conditional_prob": np.arange(0, 0.2, 0.01),
+        "shift_prob": np.arange(0, 0.2, 0.01),
+        "random_seed": np.arange(1, 10, 1),
     }
 
-    generator = RandomRTLGenerator(config)
+    resolved_config = resolve_config(config_candidates)
+    generator = RandomRTLGenerator(resolved_config)
     rtl_code = generator.generate_rtl()
     print(rtl_code)
     print("\n// Statistics:")
