@@ -44,4 +44,5 @@ def synthesize_with_yosys(sv_file: str, output_file: str):
 
 
 if __name__ == "__main__":
-    synthesize_with_yosys("designs/0/top.sv", "designs/0/net")
+    for i in range(10):
+        synthesize_with_yosys(f"designs/{i}/top.sv", f"designs/{i}/net")

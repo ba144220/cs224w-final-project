@@ -159,19 +159,13 @@ def evaluate(
 def main():
     """Main training function."""
     # Configuration
-    DESIGN_IDS = [0, 1, 2]
-    BATCH_SIZE = 3  # Small batch size since we only have 3 samples
+    DESIGN_IDS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    BATCH_SIZE = 4  # Small batch size since we only have 3 samples
     HIDDEN_DIM = 32
     NUM_EPOCHS = 1000
     LEARNING_RATE = 0.01
 
-    # Device selection: prioritize CUDA > MPS > CPU
-    if torch.cuda.is_available():
-        DEVICE = torch.device("cuda")
-    elif torch.backends.mps.is_available():
-        DEVICE = torch.device("mps")
-    else:
-        DEVICE = torch.device("cpu")
+    DEVICE = torch.device("cpu")
 
     print("=" * 70)
     print("SimpleGNN Training Script - Critical Path Prediction")

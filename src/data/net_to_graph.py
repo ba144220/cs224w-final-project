@@ -452,7 +452,8 @@ def convert_net_to_graph(
 
 
 if __name__ == "__main__":
-    convert_net_to_graph(
-        netlist_path="designs/0/net.json",
-        output_image_path="designs/0/graph.png",
-    )
+    for i in range(10):
+        convert_net_to_graph(
+            netlist_path=f"designs/{i}/net.json",
+            output_image_path=f"designs/{i}/graph.png",
+        )
