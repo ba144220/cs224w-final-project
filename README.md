@@ -28,7 +28,8 @@ designs/
 
 1. Run `python3 src/data/gen_rtl.py` to generate the RTL code for the design
 2. Copy the RTL code to `designs/<test_case_id>/top.sv`
-3. Run `python3 src/data/gen_net.py` to generate the netlist for the design. Remember to change the design ID in the script.
-4. (Optional) Run `python3 src/utils/view_net.py` to view the netlist. Remember to change the design ID in the script.
-5. Run `python3 src/data/net_to_graph.py` to convert the netlist to a PyG graph. Remember to change the design ID in the script.
-6. The graph will be saved in `designs/<test_case_id>/graph.png`
+3. Run `make run DESIGN_ID=<test_case_id>` to run the OpenLane flow. The netlist will be saved in `designs/<test_case_id>/net.json`
+4. Run `python3 src/data/gen_net.py` to generate the netlist for the design. Remember to change the design ID in the script.
+5. (Optional) Run `python3 src/utils/view_net.py` to view the netlist. Remember to change the design ID in the script.
+6. Run `python3 src/data/net_to_graph.py` to convert the netlist to a PyG graph. Remember to change the design ID in the script.
+7. The graph will be saved in `designs/<test_case_id>/graph.png`
