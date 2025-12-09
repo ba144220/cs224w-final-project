@@ -17,7 +17,13 @@ class GCNLayer(MessagePassing):
     functions for input edges (incoming) and output edges (outgoing) if bidirectional is True.
     """
 
-    def __init__(self, in_channels: int, out_channels: int, aggr: str = 'sum', bidirectional: bool = False):
+    def __init__(
+        self, 
+        in_channels: int, 
+        out_channels: int, 
+        aggr: str = 'sum', 
+        bidirectional: bool = False,
+    ) -> None:
         """
         Args:
             in_channels (int): Input channel dimension.
@@ -40,7 +46,12 @@ class GCNLayer(MessagePassing):
 
         self.bidirectional = bidirectional
 
-    def forward(self, x: torch.Tensor, edge_index: torch.Tensor, edge_attr: torch.Tensor = None) -> torch.Tensor:
+    def forward(
+        self, 
+        x: torch.Tensor, 
+        edge_index: torch.Tensor, 
+        edge_attr: torch.Tensor = None,
+    ) -> torch.Tensor:
         """
         Args:
             x (torch.Tensor): Node features.
@@ -129,7 +140,11 @@ class GCNModel(nn.Module):
         self.head = nn.Linear(hidden_channels, out_channels)
 
     def forward(
-        self, x: torch.Tensor, edge_index: torch.Tensor, edge_attr: torch.Tensor = None, batch: torch.Tensor = None
+        self, 
+        x: torch.Tensor, 
+        edge_index: torch.Tensor, 
+        edge_attr: torch.Tensor = None, 
+        batch: torch.Tensor = None
     ) -> torch.Tensor:
         """
         Forward pass of the model.
@@ -177,7 +192,14 @@ class GCNModel(nn.Module):
 def main():
     """Main function to test the GCNModel model."""
     # Test with default settings
-    model = GCNModel(in_channels=24, hidden_channels=32, out_channels=1, aggr='sum', dropout=0.3)
+    model = GCNModel(
+        in_channels=24, 
+        hidden_channels=32, 
+        out_channels=1, 
+        aggr='sum', 
+        dropout=0.3,
+        bidirectional=True
+    )
     print("Model Architecture:")
     print(model)
 
