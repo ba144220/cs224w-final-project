@@ -32,3 +32,34 @@ designs/
 4. Run `python3 src/data/gen_net.py` to generate the netlist for the design. Remember to change the design ID in the script.
 5. (Optional) Run `python3 src/utils/view_net.py` to view the netlist. Remember to change the design ID in the script.
 6. Run `python3 src/data/net_to_graph.py` to convert the netlist to a PyG graph. Remember to change the design ID in the script. The graph will be saved in `designs/<test_case_id>/graph.png`
+
+# Netlist Graph
+
+## Node Types
+
+The node types are:
+
+1. $add
+2. $and
+3. $eq
+4. $ge
+5. $gt
+6. $le
+7. $logic_not
+8. $lt
+9. $mul
+10. $mux
+11. $ne
+12. $neg
+13. $not
+14. $or
+15. $reduce_bool
+16. $reduce_or
+17. $shl
+18. $shr
+19. $sub
+20. $xor
+21. CONST0
+22. CONST1
+23. INPUT
+24. OUTPUT
