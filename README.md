@@ -63,3 +63,29 @@ The node types are:
 22. CONST1
 23. INPUT
 24. OUTPUT
+25. UNKNOWN
+
+Node feature is a one-hot encoding (dim=25) of the node type.
+
+## Edge Features
+
+Edge feature is the width of the edge (dim=1).
+
+## Example (See `examples/net.json` and run `python3 src/data/load_net.py`)
+
+```mermaid
+graph TD
+    0[0:INPUT]
+    1[1:OUTPUT]
+    2[2:ADD]
+    3[3:ADD]
+    4[4:AND]
+    5[5:CONST1]
+    0--3-->3
+    0--4-->2
+    0--1-->4
+    5--1-->3
+    5--1-->2
+    2--4-->4
+    4--4-->1
+```
