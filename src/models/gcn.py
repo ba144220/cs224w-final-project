@@ -113,6 +113,7 @@ class GCNModel(nn.Module):
         self,
         in_channels: int = 25,
         hidden_channels: int = 32,
+        num_layers: int = 3,
         out_channels: int = 1,
         aggr: str = "sum",
         dropout: float = 0.5,
@@ -125,6 +126,7 @@ class GCNModel(nn.Module):
             in_channels (int): Expected input dimension (default 25).
                               If input data has fewer channels, it will be padded.
             hidden_channels (int): Hidden dimension (default 32).
+            num_layers (int): Number of GCN layers (default 3).
             out_channels (int): Output dimension (default 1).
             aggr (str): Aggregation scheme for GCN layers ('sum' or 'max').
             dropout (float): Dropout probability (default 0.5).
@@ -138,11 +140,16 @@ class GCNModel(nn.Module):
 
         self.lin1 = nn.Linear(self.expected_in_channels, hidden_channels)
 
-        self.conv1 = GCNLayer(
-            hidden_channels, hidden_channels, aggr=aggr, bidirectional=bidirectional
-        )
-        self.conv2 = GCNLayer(
-            hidden_channels, hidden_channels, aggr=aggr, bidirectional=bidirectional
+        self.convs = nn.ModuleList(
+            [
+                GCNLayer(
+                    hidden_channels,
+                    hidden_channels,
+                    aggr=aggr,
+                    bidirectional=bidirectional,
+                )
+                for i in range(num_layers)
+            ]
         )
 
         self.head = nn.Linear(hidden_channels, out_channels)
@@ -176,15 +183,10 @@ class GCNModel(nn.Module):
         x = self.lin1(x)
         x = F.relu(x)
 
-        # Second Layer: Directed GCN
-        x = self.conv1(x, edge_index, edge_attr)
-        x = F.relu(x)
-        x = F.dropout(x, p=self.dropout_prob, training=self.training)
-
-        # Third Layer: Directed GCN
-        x = self.conv2(x, edge_index, edge_attr)
-        x = F.relu(x)
-        x = F.dropout(x, p=self.dropout_prob, training=self.training)
+        for conv in self.convs:
+            x = conv(x, edge_index, edge_attr)
+            x = F.relu(x)
+            x = F.dropout(x, p=self.dropout_prob, training=self.training)
 
         # Output Head
         if batch is None:

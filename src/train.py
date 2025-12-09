@@ -35,7 +35,8 @@ class TrainingArgs:
     shuffle: bool = True
     batch_size: int = 8
     hidden_dim: int = 32
-    dropout: float = 0.5
+    num_layers: int = 3
+    dropout: float = 0.2
     bidirectional: bool = True
     device: str = "cpu"
     learning_rate: float = 0.01
@@ -264,6 +265,7 @@ def main():
     model = GCNModel(
         in_channels=dataset[0].x.shape[1],
         hidden_channels=args.hidden_dim,
+        num_layers=args.num_layers,
         out_channels=1,
         dropout=args.dropout,
         bidirectional=args.bidirectional,  # TODO: depends on target
