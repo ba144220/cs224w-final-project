@@ -1,0 +1,18 @@
+digraph "top" {
+label="top";
+rankdir="LR";
+remincross=true;
+n1 [ shape=diamond, label="expr_719287", color="black", fontcolor="black"];
+n2 [ shape=octagon, label="input_data", color="black", fontcolor="black"];
+n3 [ shape=octagon, label="output_data", color="black", fontcolor="black"];
+c7 [ shape=record, label="{{<p4> A|<p5> B}|$3\n$mul|{<p6> Y}}",  ];
+x0 [ shape=record, style=rounded, label="<s0> 1:0 - 1:0 ", color="black", fontcolor="black" ];
+x0:e -> c7:p4:w [arrowhead=odiamond, arrowtail=odiamond, dir=both, color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+c8 [ shape=record, label="{{<p4> A|<p5> B}|$8\n$sub|{<p6> Y}}",  ];
+c7:p6:e -> n1:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n1:e -> c8:p5:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n2:e -> c7:p5:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n2:e -> c8:p4:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n2:e -> x0:s0:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+c8:p6:e -> n3:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+}

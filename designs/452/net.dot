@@ -1,0 +1,27 @@
+digraph "top" {
+label="top";
+rankdir="LR";
+remincross=true;
+n1 [ shape=octagon, label="input_data", color="black", fontcolor="black"];
+n2 [ shape=octagon, label="output_data", color="black", fontcolor="black"];
+c6 [ shape=record, label="{{<p3> A|<p4> B}|$98\n$xor|{<p5> Y}}",  ];
+x0 [ shape=record, style=rounded, label="<s3> 4x 36:36 - 3:0 ", color="black", fontcolor="black" ];
+x0:e -> c6:p3:w [arrowhead=odiamond, arrowtail=odiamond, dir=both, color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+x1 [ shape=record, style=rounded, label="<s0> 3:0 - 3:0 ", color="black", fontcolor="black" ];
+c6:p5:e -> x1:w [arrowhead=odiamond, arrowtail=odiamond, dir=both, color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+v2 [ label="1'0" ];
+c7 [ shape=record, label="{{<p3> A|<p4> B}|$30\n$ge|{<p5> Y}}",  ];
+x3 [ shape=record, style=rounded, label="<s0> 0:0 - 36:36 ", color="black", fontcolor="black" ];
+c7:p5:e -> x3:w [arrowhead=odiamond, arrowtail=odiamond, dir=both, color="black", fontcolor="black", label=""];
+x4 [ shape=record, style=rounded, label="<s31> 32x 36:36 - 31:0 ", color="black", fontcolor="black" ];
+x5 [ shape=record, style=rounded, label="<s0> 31:0 - 35:4 ", color="black", fontcolor="black" ];
+x4:e -> x5:w [arrowhead=odiamond, arrowtail=odiamond, dir=both, color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n1:e -> c6:p4:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n1:e -> c7:p4:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+x1:s0:e -> n2:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+x3:s0:e -> n2:w [color="black", fontcolor="black", label=""];
+x5:s0:e -> n2:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n2:e -> x0:s3:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n2:e -> x4:s31:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+v2:e -> c7:p3:w [color="black", fontcolor="black", label=""];
+}
