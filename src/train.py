@@ -19,12 +19,7 @@ from torch_geometric.data import Data
 from torch_geometric.loader import DataLoader
 
 from models.gcn import GCNModel
-from data.net_to_graph import (
-    load_netlist,
-    build_node_inventory,
-    build_connectivity_graph,
-    build_pyg_data,
-)
+from data.load_net import load_net
 
 
 def load_design_data(
@@ -46,13 +41,7 @@ def load_design_data(
 
     # Load graph from netlist
     print(f"Loading design {design_id}...")
-    nodes: List[Tuple[str, str]] = []
-    name2idx: dict = {}
-
-    module, net_bits = load_netlist(str(netlist_path))
-    build_node_inventory(module, nodes, name2idx)
-    edges = build_connectivity_graph(module, net_bits, nodes, name2idx)
-    data = build_pyg_data(nodes, edges)
+    data = load_net(str(netlist_path))
 
     # Load target metric from CSV
     with open(metrics_path, "r", encoding="utf-8") as f:
