@@ -5,7 +5,7 @@ Convert a netlist JSON file to a PyG graph.
 # Python imports
 import json
 from dataclasses import dataclass
-from typing import Literal, Union
+from typing import Literal, Union, Optional
 
 # External imports
 import pandas as pd
@@ -220,7 +220,10 @@ def build_graph_from_netlist(  # pylint: disable=too-many-locals,too-many-branch
 
 
 def load_data(
-    netlist_path: str, metrics_path: str, target_metrics: list[MetricTypes]
+    netlist_path: str,
+    metrics_path: str,
+    target_metrics: list[MetricTypes],
+    design_id: Optional[str] = None,
 ) -> Data:
     """
     Load data from a netlist and metrics file.
@@ -234,16 +237,18 @@ def load_data(
         reader = pd.read_csv(f)
         for i, target_metric in enumerate[MetricTypes](target_metrics):
             if target_metric == "critical_path":
-                y[i] = float(reader["critical_path_ns"])
+                y[i] = float(reader["critical_path_ns"].iloc[0])
             elif target_metric == "core_area":
-                y[i] = float(reader["CoreArea_um^2"])
+                y[i] = float(reader["CoreArea_um^2"].iloc[0])
             elif target_metric == "power":
                 y[i] = (
-                    float(reader["power_typical_internal_uW"])
-                    + float(reader["power_typical_switching_uW"])
-                    + float(reader["power_typical_leakage_uW"])
+                    float(reader["power_typical_internal_uW"].iloc[0])
+                    + float(reader["power_typical_switching_uW"].iloc[0])
+                    + float(reader["power_typical_leakage_uW"].iloc[0])
                 )
     data.y = y
+    if design_id is not None:
+        data.design_id = design_id
     return data
 
 
