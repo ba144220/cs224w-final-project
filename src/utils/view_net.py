@@ -4,6 +4,7 @@ View the netlist of a SystemVerilog file using Yosys
 
 import subprocess
 import os
+import argparse
 
 
 YOSYS_SCRIPT = """
@@ -44,4 +45,13 @@ def synthesize_with_yosys(sv_file: str, output_file: str):
 
 
 if __name__ == "__main__":
-    synthesize_with_yosys("designs/0/top.sv", "designs/0/net")
+    parser = argparse.ArgumentParser(
+        description="View net by desing id."
+    )
+    parser.add_argument(
+        "--id",
+        required=True,
+        help="Design identifier used to locate the design directory (e.g., 0).",
+    )
+    args = parser.parse_args()
+    synthesize_with_yosys(f"designs/{args.id}/top.sv", f"designs/{args.id}/net")
