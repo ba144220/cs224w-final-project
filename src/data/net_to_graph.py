@@ -140,7 +140,7 @@ def build_node_inventory(
         add_node(cell_name, cell_info["type"])
 
 
-def build_connectivity_graph(
+def build_connectivity_graph(  # pylint: disable=too-many-branches, too-many-locals
     module: Dict, net_bits: Dict, nodes: List[Tuple[str, str]], name2idx: Dict[str, int]
 ) -> set:
     """
@@ -452,8 +452,8 @@ def convert_net_to_graph(
 
 
 if __name__ == "__main__":
-    for i in range(10):
-        convert_net_to_graph(
-            netlist_path=f"designs/{i}/net.json",
-            output_image_path=f"designs/{i}/graph.png",
-        )
+
+    convert_net_to_graph(
+        netlist_path="designs/0/net.json",
+        output_image_path="designs/0/graph.png",
+    )

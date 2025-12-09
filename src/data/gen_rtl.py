@@ -28,7 +28,7 @@ def resolve_config(config_candidates):
     return resolved
 
 
-class RandomRTLGenerator:
+class RandomRTLGenerator:  # pylint: disable=too-many-instance-attributes
     """Random RTL generator."""
 
     def __init__(self, config):
@@ -69,7 +69,6 @@ class RandomRTLGenerator:
         self.temp_widths = {}
         self.defined_temps = []  # Track temporaries that have been assigned
         self.used_input_bits = set()
-        # self.defined_output_bits = set()
 
         self.now_tmp_id = 0
 
@@ -81,7 +80,13 @@ class RandomRTLGenerator:
         """Get a random bit width."""
         return random.randint(min_w, max_w)
 
-    def get_operand(self, current_width=None, force_input=False, only_defined=False, no_input=False):
+    def get_operand(
+        self,
+        current_width: int = None,
+        force_input: bool = False,
+        only_defined: bool = False,
+        no_input: bool = False,
+    ):  # pylint: disable=too-many-return-statements
         """Generate a random operand (input bit slice, temp, or constant)."""
         if current_width is None:
             current_width = self.get_random_width()
@@ -94,8 +99,13 @@ class RandomRTLGenerator:
         available_temps = self.defined_temps if only_defined else self.temps
 
         # Decide operand type
-        if no_input or (available_temps and self.prob_event(
-            self.config["temp_prob"] + (1 - self.config["temp_prob"]) * self.now_tmp_id / self.config["num_temps"]
+        if no_input or (
+            available_temps
+            and self.prob_event(
+                self.config["temp_prob"]
+                + (1 - self.config["temp_prob"])
+                * self.now_tmp_id
+                / self.config["num_temps"]
             )
         ):
             # Use a temporary
@@ -106,45 +116,45 @@ class RandomRTLGenerator:
             if self.prob_event(self.config["lowertrunc_prob"]) and temp_width > 1:
                 high = random.randint(1, temp_width - 1)
                 return f"{temp}[{high}:0]", high + 1
-            elif self.prob_event(self.config["uppertrunc_prob"]) and temp_width > 1:
+            if self.prob_event(self.config["uppertrunc_prob"]) and temp_width > 1:
                 low = random.randint(1, temp_width - 1)
                 return f"{temp}[{temp_width-1}:{low}]", temp_width - low
-            else:
-                return temp, temp_width
+            return temp, temp_width
 
-        elif self.prob_event(self.config["const_prob"]):
+        if self.prob_event(self.config["const_prob"]):
             # Use a constant
             is_neg = self.prob_event(self.config["negconst_prob"])
             max_val = (1 << current_width) - 1
             if is_neg and current_width > 1:
                 val = -random.randint(1, max(1, max_val // 2))
                 return f"-{current_width}'d{-val}", current_width
-            else:
-                val = random.randint(0, max_val)
-                return f"{current_width}'d{val}", current_width
+            val = random.randint(0, max_val)
+            return f"{current_width}'d{val}", current_width
 
-        else:
-            # Use input bit slice
-            return self._get_input_operand(current_width)
+        return self._get_input_operand(current_width)
 
     def _get_input_operand(self, current_width):
         """Get an input operand and mark bits as used."""
         if self.inp_width == 1:
             self.used_input_bits.add(0)
             return "input_data", 1
-        else:
-            # Select random bit range
-            width = min(current_width, self.inp_width)
-            high = random.randint(width - 1, self.inp_width - 1)
-            low = high - width + 1
-            for i in range(low, high + 1):
-                self.used_input_bits.add(i)
-            if width == self.inp_width:
-                return "input_data", width
-            else:
-                return f"input_data[{high}:{low}]", width
+        # Select random bit range
+        width = min(current_width, self.inp_width)
+        high = random.randint(width - 1, self.inp_width - 1)
+        low = high - width + 1
+        for i in range(low, high + 1):
+            self.used_input_bits.add(i)
+        if width == self.inp_width:
+            return "input_data", width
+        return f"input_data[{high}:{low}]", width
 
-    def generate_expression(self, target_width, force_input=False, only_defined=False, no_input=False):
+    def generate_expression(
+        self,
+        target_width: int,
+        force_input: bool = False,
+        only_defined: bool = False,
+        no_input: bool = False,
+    ):  # pylint: disable=too-many-branches, too-many-locals
         """Generate a random combinational expression."""
         num_terms = random.randint(1, self.config["num_terms"])
 
@@ -160,7 +170,10 @@ class RandomRTLGenerator:
 
         # Start with first operand
         expr, width = self.get_operand(
-            target_width, force_input=force_input, only_defined=only_defined, no_input=no_input
+            target_width,
+            force_input=force_input,
+            only_defined=only_defined,
+            no_input=no_input,
         )
 
         for i in range(num_terms - 1):
@@ -168,7 +181,10 @@ class RandomRTLGenerator:
             # Force at least one input usage per expression
             use_input = force_input and (i == 0 or random.random() < 0.3)
             operand, op_width = self.get_operand(
-                target_width, force_input=use_input, only_defined=only_defined, no_input=no_input
+                target_width,
+                force_input=use_input,
+                only_defined=only_defined,
+                no_input=no_input,
             )
 
             # Handle signed/unsigned mixing
@@ -214,13 +230,13 @@ class RandomRTLGenerator:
 
         return expr, width, additional_lines
 
-    def generate_rtl(self):
+    def generate_rtl(self):  # pylint: disable=too-many-branches, too-many-locals
         """Generate the complete random RTL module."""
         lines = []
-        lines.append(f"module top (")
+        lines.append("module top (")
         lines.append(f"    input [{self.inp_width-1}:0] input_data,")
         lines.append(f"    output [{self.out_width-1}:0] output_data")
-        lines.append(f");")
+        lines.append(");")
         lines.append("")
 
         # Generate exactly num_temps temporaries
@@ -300,7 +316,8 @@ class RandomRTLGenerator:
 
 
 # Example usage
-if __name__ == "__main__":
+def main():
+    """Main function."""
     # Fill each entry with either a single value or a list/tuple of candidates.
     # If a list/tuple is provided, one candidate will be chosen uniformly at random.
     config_candidates = {
@@ -337,3 +354,7 @@ if __name__ == "__main__":
     # Write to file
     with open("random_rtl.sv", "w", encoding="utf-8") as f:
         f.write(rtl_code)
+
+
+if __name__ == "__main__":
+    main()
