@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 from torch_geometric.data import Data
 from torch_geometric.loader import DataLoader
 
-from models.simple_gnn import SimpleGNN
+from models.gcn import GCNModel
 from data.net_to_graph import (
     load_netlist,
     build_node_inventory,
@@ -129,7 +129,7 @@ def train_epoch(
         data_batch = data_batch.to(device)
 
         optimizer.zero_grad()
-        out = model(data_batch.x, data_batch.edge_index, data_batch.batch)
+        out = model(data_batch.x, data_batch.edge_index, edge_attr=data_batch.edge_attr, batch=data_batch.batch)
         loss = F.mse_loss(out, data_batch.y.view(-1, 1))
         loss.backward()
         optimizer.step()
@@ -162,7 +162,7 @@ def evaluate(
     for data_batch in loader:
         data_batch = data_batch.to(device)
 
-        out = model(data_batch.x, data_batch.edge_index, data_batch.batch)
+        out = model(data_batch.x, data_batch.edge_index, edge_attr=data_batch.edge_attr, batch=data_batch.batch)
         loss = F.mse_loss(out, data_batch.y.view(-1, 1))
 
         total_loss += loss.item()
@@ -268,7 +268,7 @@ def save_model(model: torch.nn.Module, save_dir: str = "./checkpoints") -> None:
     """
     model_path = Path(save_dir)
     model_path.mkdir(exist_ok=True)
-    save_file = model_path / "simple_gnn.pt"
+    save_file = model_path / "gcn_model.pt"
     torch.save(model.state_dict(), save_file)
     print(f"\nModel saved to {save_file}")
 
@@ -279,6 +279,7 @@ BATCH_SIZE = 4
 HIDDEN_DIM = 32
 NUM_EPOCHS = 1000
 LEARNING_RATE = 0.01
+DROPOUT = 0.5
 
 DEVICE = torch.device("cpu")
 
@@ -287,7 +288,7 @@ def main():
     """Main training function."""
 
     print("=" * 70)
-    print("SimpleGNN Training Script - Critical Path Prediction")
+    print("GCNModel Training Script - Critical Path Prediction")
     print("=" * 70)
     print(f"Device: {DEVICE}")
     print(f"Design IDs: {DESIGN_IDS}")
@@ -295,6 +296,7 @@ def main():
     print(f"Hidden Dim: {HIDDEN_DIM}")
     print(f"Epochs: {NUM_EPOCHS}")
     print(f"Learning Rate: {LEARNING_RATE}")
+    print(f"Dropout: {DROPOUT}")
     print("=" * 70)
 
     # Load dataset
@@ -309,9 +311,13 @@ def main():
     test_loader = DataLoader(pyg_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
     # Initialize model
-    in_features = pyg_dataset[0].num_features  # Should be 9 (number of OP_TYPES)
-    model = SimpleGNN(
-        in_channels=in_features, hidden_channels=HIDDEN_DIM, out_channels=1
+    # The model expects 24 dimensions, but data has 9. It will pad automatically.
+    model = GCNModel(
+        in_channels=24, 
+        hidden_channels=HIDDEN_DIM, 
+        out_channels=1, 
+        dropout=DROPOUT, 
+        bidirectional=True # TODO: depends on target
     )
     model = model.to(DEVICE)
 
