@@ -129,7 +129,7 @@ def train_epoch(
         data_batch = data_batch.to(device)
 
         optimizer.zero_grad()
-        out = model(data_batch.x, data_batch.edge_index, data_batch.batch)
+        out = model(data_batch.x, data_batch.edge_index, edge_attr=data_batch.edge_attr, batch=data_batch.batch)
         loss = F.mse_loss(out, data_batch.y.view(-1, 1))
         loss.backward()
         optimizer.step()
@@ -162,7 +162,7 @@ def evaluate(
     for data_batch in loader:
         data_batch = data_batch.to(device)
 
-        out = model(data_batch.x, data_batch.edge_index, data_batch.batch)
+        out = model(data_batch.x, data_batch.edge_index, edge_attr=data_batch.edge_attr, batch=data_batch.batch)
         loss = F.mse_loss(out, data_batch.y.view(-1, 1))
 
         total_loss += loss.item()
@@ -313,7 +313,11 @@ def main():
     # Initialize model
     # The model expects 24 dimensions, but data has 9. It will pad automatically.
     model = GCNModel(
-        in_channels=24, hidden_channels=HIDDEN_DIM, out_channels=1, dropout=DROPOUT
+        in_channels=24, 
+        hidden_channels=HIDDEN_DIM, 
+        out_channels=1, 
+        dropout=DROPOUT, 
+        bidirectional=True # TODO: depends on target
     )
     model = model.to(DEVICE)
 
