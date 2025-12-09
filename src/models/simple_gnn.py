@@ -1,22 +1,36 @@
+"""
+Simple GCN layer and model for critical path prediction.
+"""
+
 import torch
 import torch.nn.functional as F
-from torch_geometric.nn import MessagePassing, global_mean_pool
+from torch_geometric.nn import global_mean_pool
 from torch_geometric.utils import add_self_loops, degree
 
 
-class SimpleGCNLayer(MessagePassing):
+class SimpleGCNLayer(torch.nn.Module):
     """
-    A simple GCN layer implemented using the MessagePassing base class.
+    A simple GCN layer implemented using torch.nn.Module.
 
     Implements the graph convolution operator from the "Semi-supervised Classification
     with Graph Convolutional Networks" <https://arxiv.org/abs/1609.02907> paper.
     """
 
     def __init__(self, in_channels: int, out_channels: int):
-        super().__init__(aggr="add")  # "Add" aggregation (Step 5).
+        super().__init__()
         self.lin = torch.nn.Linear(in_channels, out_channels)
 
     def forward(self, x: torch.Tensor, edge_index: torch.Tensor) -> torch.Tensor:
+        """
+        Forward pass of the SimpleGCNLayer.
+
+        Args:
+            x (torch.Tensor): Node feature matrix of shape [num_nodes, in_channels].
+            edge_index (torch.Tensor): Graph connectivity matrix of shape [2, num_edges].
+
+        Returns:
+            torch.Tensor: Output matrix of shape [num_nodes, out_channels].
+        """
         # x has shape [N, in_channels]
         # edge_index has shape [2, E]
 
@@ -33,15 +47,16 @@ class SimpleGCNLayer(MessagePassing):
         deg_inv_sqrt[deg_inv_sqrt == float("inf")] = 0
         norm = deg_inv_sqrt[row] * deg_inv_sqrt[col]
 
-        # Step 4-5: Start propagating messages.
-        return self.propagate(edge_index, x=x, norm=norm)
+        # Step 4: Normalize neighbor features.
+        # Gather neighbor features (x[col]) and apply normalization
+        x_j = x[col]  # Shape: [E, out_channels]
+        messages = norm.view(-1, 1) * x_j  # Shape: [E, out_channels]
 
-    def message(self, x_j: torch.Tensor, norm: torch.Tensor) -> torch.Tensor:
-        # x_j has shape [E, out_channels]
-        # norm has shape [E]
+        # Step 5: Aggregate messages (sum aggregation).
+        out = torch.zeros_like(x)  # Shape: [N, out_channels]
+        out.index_add_(0, row, messages)
 
-        # Step 4: Normalize node features.
-        return norm.view(-1, 1) * x_j
+        return out
 
 
 class SimpleGNN(torch.nn.Module):
@@ -104,22 +119,23 @@ class SimpleGNN(torch.nn.Module):
         return x
 
 
-if __name__ == "__main__":
+def main():
+    """Main function to test the SimpleGNN model."""
     # Example usage
     # The number of input features matches the number of OP_TYPES in net_to_graph.py (which is 9)
-    in_features = 9
+    in_feature = 9
     hidden_dim = 16
     out_dim = 1  # Example output dimension (single value prediction)
 
     model = SimpleGNN(
-        in_channels=in_features, hidden_channels=hidden_dim, out_channels=out_dim
+        in_channels=in_feature, hidden_channels=hidden_dim, out_channels=out_dim
     )
     print("Model Architecture:")
     print(model)
 
     # Create dummy data to test
     num_nodes = 10
-    x = torch.randn((num_nodes, in_features))
+    x = torch.randn((num_nodes, in_feature))
     edge_index = torch.tensor([[0, 1, 1, 2], [1, 0, 2, 1]], dtype=torch.long)
 
     # Single graph (batch=None)
@@ -131,3 +147,7 @@ if __name__ == "__main__":
     batch = torch.tensor([0] * 5 + [1] * 5, dtype=torch.long)
     out_batch = model(x, edge_index, batch)
     print(f"Output shape (batch of 2): {out_batch.shape}")
+
+
+if __name__ == "__main__":
+    main()
