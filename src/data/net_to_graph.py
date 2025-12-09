@@ -253,9 +253,7 @@ def build_pyg_data(nodes: List[Tuple[str, str]], edges: set) -> Data:
     # Report unknown types if any
     if unknown_types:
         print(
-            f"Warning: Found {
-                len(unknown_types)} unknown cell type(s): {
-                sorted(unknown_types)}"
+            f"Warning: Found {len(unknown_types)} unknown cell type(s): {sorted(unknown_types)}"
         )
         print("These have been mapped to 'UNKNOWN' type.")
 
