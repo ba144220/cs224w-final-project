@@ -1,96 +1,46 @@
 """
-Training script for SimpleGNN model to predict critical path timing.
-
-This script:
-1. Loads circuit graphs from netlist JSON files
-2. Loads target metrics (critical_path_ns) from CSV files
-3. Trains a SimpleGNN model on the available designs
-4. Evaluates on the same designs (sanity check)
+Training script for GNN models to predict PPA.
 """
 
-import csv
-from pathlib import Path
-from typing import List, Tuple
+# Python imports
+from dataclasses import dataclass
+import sys
+import os
 
+
+# External imports
 import torch
 import torch.nn.functional as F
-import matplotlib.pyplot as plt
-from torch_geometric.data import Data
 from torch_geometric.loader import DataLoader
+from transformers import HfArgumentParser
+import matplotlib.pyplot as plt
 
+
+# Local imports
+from data.load_dataset import MetricTypes, load_dataset, split_data, normalize_data
 from models.gcn import GCNModel
-from data.load_net import load_net
 
 
-def load_design_data(
-    design_id: int, base_path: str = "./designs"
-) -> Tuple[Data, float]:
+@dataclass
+class TrainingArgs:
     """
-    Load a single design's graph and target metric.
-
-    Args:
-        design_id (int): Design ID (e.g., 0, 1, 2)
-        base_path (str): Base path to designs directory
-
-    Returns:
-        Tuple[Data, float]: PyG Data object and target critical_path_ns value
+    Arguments for training the GNN model.
     """
-    design_path = Path(base_path) / str(design_id)
-    netlist_path = design_path / "net.json"
-    metrics_path = design_path / "metrics.csv"
 
-    # Load graph from netlist
-    print(f"Loading design {design_id}...")
-    data = load_net(str(netlist_path))
-
-    # Load target metric from CSV
-    with open(metrics_path, "r", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        row = next(reader)
-        critical_path_ns = float(row["critical_path_ns"])
-
-    print(
-        f"  Nodes: {data.num_nodes}, Edges: {data.num_edges}, Target: {critical_path_ns:.3f} ns"
-    )
-
-    return data, critical_path_ns
-
-
-def load_all_designs(
-    design_ids: List[int], base_path: str = "./designs"
-) -> List[Tuple[Data, float]]:
-    """
-    Load all designs' graphs and target metrics.
-
-    Args:
-        design_ids (List[int]): List of design IDs to load
-        base_path (str): Base path to designs directory
-
-    Returns:
-        List[Tuple[Data, float]]: List of (Data, target) tuples
-    """
-    dataset = []
-    for design_id in design_ids:
-        data, target = load_design_data(design_id, base_path)
-        dataset.append((data, target))
-    return dataset
-
-
-def create_pyg_dataset(dataset: List[Tuple[Data, float]]) -> List[Data]:
-    """
-    Create PyG dataset with targets attached to Data objects.
-
-    Args:
-        dataset: List of (Data, target) tuples
-
-    Returns:
-        List[Data]: List of PyG Data objects with targets attached
-    """
-    pyg_dataset = []
-    for data, target in dataset:
-        data.y = torch.tensor([target], dtype=torch.float)
-        pyg_dataset.append(data)
-    return pyg_dataset
+    design_dir: str = "./designs"
+    target_metrics: list[MetricTypes] = None
+    train_ratio: float = 0.6
+    val_ratio: float = 0.2
+    seed: int = 42
+    shuffle: bool = True
+    batch_size: int = 8
+    hidden_dim: int = 32
+    dropout: float = 0.5
+    bidirectional: bool = True
+    device: str = "cpu"
+    learning_rate: float = 0.01
+    num_epochs: int = 1000
+    save_dir: str = "./checkpoints"
 
 
 def train_epoch(
@@ -118,7 +68,12 @@ def train_epoch(
         data_batch = data_batch.to(device)
 
         optimizer.zero_grad()
-        out = model(data_batch.x, data_batch.edge_index, edge_attr=data_batch.edge_attr, batch=data_batch.batch)
+        out = model(
+            data_batch.x,
+            data_batch.edge_index,
+            edge_attr=data_batch.edge_attr,
+            batch=data_batch.batch,
+        )
         loss = F.mse_loss(out, data_batch.y.view(-1, 1))
         loss.backward()
         optimizer.step()
@@ -131,7 +86,7 @@ def train_epoch(
 @torch.no_grad()
 def evaluate(
     model: torch.nn.Module, loader: DataLoader, device: torch.device
-) -> Tuple[float, List[float], List[float]]:
+) -> tuple[float, list[float], list[float]]:
     """
     Evaluate the model.
 
@@ -151,7 +106,12 @@ def evaluate(
     for data_batch in loader:
         data_batch = data_batch.to(device)
 
-        out = model(data_batch.x, data_batch.edge_index, edge_attr=data_batch.edge_attr, batch=data_batch.batch)
+        out = model(
+            data_batch.x,
+            data_batch.edge_index,
+            edge_attr=data_batch.edge_attr,
+            batch=data_batch.batch,
+        )
         loss = F.mse_loss(out, data_batch.y.view(-1, 1))
 
         total_loss += loss.item()
@@ -163,7 +123,10 @@ def evaluate(
 
 
 def print_final_evaluation(
-    test_preds: List[float], test_targets: List[float], test_loss: float
+    test_preds: list[float],
+    test_targets: list[float],
+    test_loss: float,
+    test_loader: DataLoader,
 ) -> None:
     """
     Print final evaluation results including predictions vs ground truth.
@@ -187,7 +150,12 @@ def print_final_evaluation(
     print("-" * 50)
     for i, (pred, target) in enumerate(zip(test_preds, test_targets)):
         error = abs(pred - target)
-        print(f"{DESIGN_IDS[i]:<12} {pred:<18.4f} {target:<15.4f} {error:.4f}")
+        design_id = (
+            test_loader.dataset[i].design_id
+            if hasattr(test_loader.dataset[i], "design_id")
+            else i
+        )
+        print(f"{design_id:<12} {pred:<18.4f} {target:<15.4f} {error:.4f}")
     print("-" * 50)
 
     # Calculate metrics
@@ -199,8 +167,8 @@ def print_final_evaluation(
 
 
 def plot_training_history(
-    train_losses: List[float],
-    test_losses: List[float],
+    train_losses: list[float],
+    test_losses: list[float],
     num_epochs: int,
     save_path: str = "./checkpoints/training_history.png",
 ) -> None:
@@ -240,8 +208,8 @@ def plot_training_history(
     plt.tight_layout()
 
     # Save plot
-    plot_path = Path(save_path)
-    plot_path.parent.mkdir(parents=True, exist_ok=True)
+    plot_path = save_path
+    os.makedirs(os.path.dirname(plot_path), exist_ok=True)
     plt.savefig(plot_path, dpi=150, bbox_inches="tight")
     print(f"Training history plot saved to {plot_path}")
     plt.close()
@@ -255,67 +223,59 @@ def save_model(model: torch.nn.Module, save_dir: str = "./checkpoints") -> None:
         model: The model to save
         save_dir: Directory to save the model (default: ./checkpoints)
     """
-    model_path = Path(save_dir)
-    model_path.mkdir(exist_ok=True)
-    save_file = model_path / "gcn_model.pt"
+    model_path = save_dir
+    os.makedirs(os.path.dirname(model_path), exist_ok=True)
+    save_file = os.path.join(model_path, "gcn_model.pt")
     torch.save(model.state_dict(), save_file)
     print(f"\nModel saved to {save_file}")
 
 
-# Configuration
-DESIGN_IDS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-BATCH_SIZE = 4
-HIDDEN_DIM = 32
-NUM_EPOCHS = 1000
-LEARNING_RATE = 0.01
-DROPOUT = 0.5
-
-DEVICE = torch.device("cpu")
-
-
 def main():
-    """Main training function."""
+    """
+    Train the GNN model to predict PPA.
+    """
+    # Parse command line arguments
+    parser = HfArgumentParser(TrainingArgs)
+    if len(sys.argv) == 2 and sys.argv[1].endswith((".yaml", ".yml")):
+        # If a YAML file is provided, parse it
+        yaml_file = sys.argv[1]
+        print(f"Loading configuration from {yaml_file}")
+        args = parser.parse_yaml_file(yaml_file=yaml_file)[0]
 
-    print("=" * 70)
-    print("GCNModel Training Script - Critical Path Prediction")
-    print("=" * 70)
-    print(f"Device: {DEVICE}")
-    print(f"Design IDs: {DESIGN_IDS}")
-    print(f"Batch Size: {BATCH_SIZE}")
-    print(f"Hidden Dim: {HIDDEN_DIM}")
-    print(f"Epochs: {NUM_EPOCHS}")
-    print(f"Learning Rate: {LEARNING_RATE}")
-    print(f"Dropout: {DROPOUT}")
-    print("=" * 70)
+    else:
+        # If no YAML file is provided, parse the command line arguments
+        args = parser.parse_args()
 
-    # Load dataset
-    print("\nLoading dataset...")
-    dataset = load_all_designs(DESIGN_IDS)
-
-    # Create PyG Data objects with targets
-    pyg_dataset = create_pyg_dataset(dataset)
-
-    # Create DataLoader
-    train_loader = DataLoader(pyg_dataset, batch_size=BATCH_SIZE, shuffle=True)
-    test_loader = DataLoader(pyg_dataset, batch_size=BATCH_SIZE, shuffle=False)
-
-    # Initialize model
-    # The model expects 24 dimensions, but data has 9. It will pad automatically.
-    model = GCNModel(
-        in_channels=24, 
-        hidden_channels=HIDDEN_DIM, 
-        out_channels=1, 
-        dropout=DROPOUT, 
-        bidirectional=True # TODO: depends on target
+    if args.target_metrics is None:
+        args.target_metrics = ["critical_path"]
+    dataset = load_dataset(args.design_dir, args.target_metrics)
+    dataset = normalize_data(dataset)
+    train_data, val_data, test_data = split_data(
+        dataset, args.train_ratio, args.val_ratio, args.shuffle, args.seed
     )
-    model = model.to(DEVICE)
+
+    # Create DataLoaders
+    train_loader = DataLoader(
+        train_data, batch_size=args.batch_size, shuffle=args.shuffle
+    )
+    val_loader = DataLoader(val_data, batch_size=args.batch_size, shuffle=False)
+    test_loader = DataLoader(test_data, batch_size=args.batch_size, shuffle=False)
+
+    model = GCNModel(
+        in_channels=dataset[0].x.shape[1],
+        hidden_channels=args.hidden_dim,
+        out_channels=1,
+        dropout=args.dropout,
+        bidirectional=args.bidirectional,  # TODO: depends on target
+    )
+    model = model.to(args.device)
 
     print("\nModel Architecture:")
     print(model)
     print(f"Total parameters: {sum(p.numel() for p in model.parameters())}")
 
     # Initialize optimizer
-    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
 
     # Training loop
     print("\n" + "=" * 70)
@@ -325,31 +285,31 @@ def main():
     train_losses = []
     test_losses = []
 
-    for epoch in range(1, NUM_EPOCHS + 1):
-        train_loss = train_epoch(model, train_loader, optimizer, DEVICE)
+    for epoch in range(1, args.num_epochs + 1):
+        train_loss = train_epoch(model, train_loader, optimizer, args.device)
         train_losses.append(train_loss)
 
         # Evaluate on test set
-        test_loss, _, _ = evaluate(model, test_loader, DEVICE)
+        test_loss, _, _ = evaluate(model, val_loader, args.device)
         test_losses.append(test_loss)
 
-        if epoch % 50 == 0 or epoch == 1:
+        if epoch % 10 == 0 or epoch == 1:
             print(
                 f"Epoch {epoch:4d} | Train Loss: {train_loss:.6f} | Test Loss: {test_loss:.6f}"
             )
 
     # Final evaluation and reporting
-    final_loss, final_preds, final_targets = evaluate(model, test_loader, DEVICE)
-    print_final_evaluation(final_preds, final_targets, final_loss)
+    final_loss, final_preds, final_targets = evaluate(model, test_loader, args.device)
+    print_final_evaluation(final_preds, final_targets, final_loss, test_loader)
 
     # Plot training history
     print("\n" + "=" * 70)
     print("Plotting Training History")
     print("=" * 70)
-    plot_training_history(train_losses, test_losses, NUM_EPOCHS)
+    plot_training_history(train_losses, test_losses, args.num_epochs)
 
     # Save model
-    save_model(model)
+    save_model(model, args.save_dir)
 
 
 if __name__ == "__main__":

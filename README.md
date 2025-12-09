@@ -89,3 +89,15 @@ graph TD
     2--4-->4
     4--4-->1
 ```
+
+# Training
+
+```bash
+python3 src/train.py configs/test.yaml
+```
+
+or
+
+```bash
+python3 src/train.py --design_dir <design_dir> ...
+```

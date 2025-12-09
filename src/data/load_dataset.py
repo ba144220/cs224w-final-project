@@ -9,6 +9,7 @@ from typing import Optional
 
 # External imports
 from torch_geometric.data import Data
+import torch
 
 
 # Local imports
@@ -31,6 +32,19 @@ def load_dataset(
             design_id=design_id,
         )
         dataset.append(data)
+
+    return dataset
+
+
+def normalize_data(dataset: list[Data]) -> list[Data]:
+    """
+    Normalize the data.
+    """
+    # Normalize y
+    y = torch.stack([data.y for data in dataset], dim=0)
+    y = (y - y.mean(dim=0)) / y.std(dim=0)
+    for data, y_i in zip(dataset, y):
+        data.y = y_i
     return dataset
 
 
