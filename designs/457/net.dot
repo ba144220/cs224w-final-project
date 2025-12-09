@@ -1,0 +1,28 @@
+digraph "top" {
+label="top";
+rankdir="LR";
+remincross=true;
+n3 [ shape=octagon, label="input_data", color="black", fontcolor="black"];
+n4 [ shape=octagon, label="output_data", color="black", fontcolor="black"];
+n5 [ shape=diamond, label="temp_0", color="black", fontcolor="black"];
+c8 [ shape=record, label="{{<p6> A}|$14\n$not|{<p7> Y}}",  ];
+c10 [ shape=record, label="{{<p6> A|<p9> B}|$18\n$or|{<p7> Y}}",  ];
+x0 [ shape=record, style=rounded, label="<s0> 0:0 - 0:0 ", color="black", fontcolor="black" ];
+x0:e -> c10:p9:w [arrowhead=odiamond, arrowtail=odiamond, dir=both, color="black", fontcolor="black", label=""];
+c11 [ shape=record, label="{{<p6> A|<p9> B}|$1\n$ge|{<p7> Y}}",  ];
+c12 [ shape=record, label="{{<p6> A|<p9> B}|$10\n$mul|{<p7> Y}}",  ];
+x1 [ shape=record, style=rounded, label="1 -&gt; 16:5 |<s1> 4:1 - 4:1 |<s0> 0:0 - 0:0 ", color="black", fontcolor="black" ];
+x1:e -> c12:p6:w [arrowhead=odiamond, arrowtail=odiamond, dir=both, color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n1 [ shape=point ];
+c8:p7:e -> n1:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n1:e -> x0:s0:w [color="black", fontcolor="black", label=""];
+n1:e -> x1:s1:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+c10:p7:e -> x1:s0:w [color="black", fontcolor="black", label=""];
+n3:e -> c11:p6:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n3:e -> c11:p9:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n3:e -> c12:p9:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n3:e -> c8:p6:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+c12:p7:e -> n4:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+c11:p7:e -> n5:w [color="black", fontcolor="black", label=""];
+n5:e -> c10:p6:w [color="black", fontcolor="black", label=""];
+}

@@ -1,0 +1,29 @@
+digraph "top" {
+label="top";
+rankdir="LR";
+remincross=true;
+n4 [ shape=octagon, label="input_data", color="black", fontcolor="black"];
+n5 [ shape=octagon, label="output_data", color="black", fontcolor="black"];
+n6 [ shape=diamond, label="temp_0", color="black", fontcolor="black"];
+n7 [ shape=diamond, label="temp_2", color="black", fontcolor="black"];
+c11 [ shape=record, label="{{<p8> A|<p9> B}|$3\n$and|{<p10> Y}}",  ];
+c12 [ shape=record, label="{{<p8> A|<p9> B}|$5\n$mul|{<p10> Y}}",  ];
+c13 [ shape=record, label="{{<p8> A|<p9> B}|$6\n$mul|{<p10> Y}}",  ];
+c14 [ shape=record, label="{{<p8> A|<p9> B}|$1\n$sub|{<p10> Y}}",  ];
+c15 [ shape=record, label="{{<p8> A|<p9> B}|$2\n$xor|{<p10> Y}}",  ];
+x0 [ shape=record, style=rounded, label="0 -&gt; 23:12 |<s0> 11:0 - 11:0 ", color="black", fontcolor="black" ];
+c12:p10:e -> c13:p8:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+c14:p10:e -> c15:p8:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+c15:p10:e -> c11:p8:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n4:e -> c11:p9:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n4:e -> c14:p8:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n4:e -> c14:p9:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n4:e -> c15:p9:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+x0:e -> n5:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+c11:p10:e -> n6:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n6:e -> c12:p8:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n6:e -> c12:p9:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n6:e -> c13:p9:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+c13:p10:e -> n7:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n7:e -> x0:s0:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+}
