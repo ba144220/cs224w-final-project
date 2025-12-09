@@ -5,9 +5,10 @@ Convert a netlist JSON file to a PyG graph.
 # Python imports
 import json
 from dataclasses import dataclass
-from typing import Literal, Union
+from typing import Literal, Union, Optional
 
 # External imports
+import pandas as pd
 import torch
 from torch_geometric.data import Data
 
@@ -70,6 +71,9 @@ NodeTypes = Literal[
 ]
 
 
+MetricTypes = Literal["critical_path", "core_area", "power"]
+
+
 @dataclass
 class Node:
     """A node in the netlist."""
@@ -127,7 +131,9 @@ def process_cell(cell: dict) -> Node:
     return Node(input_bits, output_bits, cell_type)
 
 
-def load_net(path: str) -> Data:  # pylint: disable=too-many-locals,too-many-branches
+def build_graph_from_netlist(  # pylint: disable=too-many-locals,too-many-branches
+    netlist_path: str,
+) -> Data:
     """
     Load and parse the Yosys netlist JSON file.
 
@@ -137,7 +143,7 @@ def load_net(path: str) -> Data:  # pylint: disable=too-many-locals,too-many-bra
     - edge_attr: edge features (num_edges, 1)
         - width: width of the edge (integer)
     """
-    with open(path, "r", encoding="utf-8") as f:
+    with open(netlist_path, "r", encoding="utf-8") as f:
         netlist_json = json.load(f)
 
     cells = netlist_json["modules"]["top"]["cells"]
@@ -213,14 +219,52 @@ def load_net(path: str) -> Data:  # pylint: disable=too-many-locals,too-many-bra
     return Data(x=node_features, edge_index=edge_index, edge_attr=edge_features)
 
 
+def load_data(
+    netlist_path: str,
+    metrics_path: str,
+    target_metrics: list[MetricTypes],
+    design_id: Optional[str] = None,
+) -> Data:
+    """
+    Load data from a netlist and metrics file.
+    """
+    data = build_graph_from_netlist(netlist_path)
+
+    if len(target_metrics) == 0:
+        return data
+    y = torch.zeros(len(target_metrics), dtype=torch.float)  # (num_targets,)
+    with open(metrics_path, "r", encoding="utf-8") as f:
+        reader = pd.read_csv(f)
+        for i, target_metric in enumerate[MetricTypes](target_metrics):
+            if target_metric == "critical_path":
+                y[i] = float(reader["critical_path_ns"].iloc[0])
+            elif target_metric == "core_area":
+                y[i] = float(reader["CoreArea_um^2"].iloc[0])
+            elif target_metric == "power":
+                y[i] = (
+                    float(reader["power_typical_internal_uW"].iloc[0])
+                    + float(reader["power_typical_switching_uW"].iloc[0])
+                    + float(reader["power_typical_leakage_uW"].iloc[0])
+                )
+    data.y = y
+    if design_id is not None:
+        data.design_id = design_id
+    return data
+
+
 def main():
     """
     Main function.
     """
-    data = load_net("examples/net.json")
+    data = load_data(
+        "examples/net.json",
+        "examples/metrics.csv",
+        ["critical_path", "core_area", "power"],
+    )
     print(data.x)
     print(data.edge_index)
     print(data.edge_attr)
+    print(data.y)
 
 
 if __name__ == "__main__":
