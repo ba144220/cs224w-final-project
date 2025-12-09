@@ -1,0 +1,62 @@
+{
+  "creator": "Yosys 0.60 (git sha1 5bafeb77dc71e054fa331ab9efa613e6fb0a1c49, clang++ 17.0.0 -fPIC -O3)",
+  "modules": {
+    "top": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "designs/1097/top.sv:1.1-26.10"
+      },
+      "ports": {
+        "input_data": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5 ]
+        },
+        "output_data": {
+          "direction": "output",
+          "bits": [ 6, 7, 8, 5, "0", "0", "0", "0", "0", "0", "0", "0" ]
+        }
+      },
+      "cells": {
+        "$auto$opt_expr.cc:276:group_cell_inputs$4": {
+          "hide_name": 1,
+          "type": "$or",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000011",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000011",
+            "Y_WIDTH": "00000000000000000000000000000011"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 3, 4, 5 ],
+            "B": [ 2, 3, 4 ],
+            "Y": [ 6, 7, 8 ]
+          }
+        }
+      },
+      "netnames": {
+        "input_data": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+            "src": "designs/1097/top.sv:2.17-2.27"
+          }
+        },
+        "output_data": {
+          "hide_name": 0,
+          "bits": [ 6, 7, 8, 5, "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "designs/1097/top.sv:3.19-3.30"
+          }
+        }
+      }
+    }
+  }
+}

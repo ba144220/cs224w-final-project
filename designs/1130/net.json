@@ -1,0 +1,1212 @@
+{
+  "creator": "Yosys 0.60 (git sha1 5bafeb77dc71e054fa331ab9efa613e6fb0a1c49, clang++ 17.0.0 -fPIC -O3)",
+  "modules": {
+    "top": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "designs/1130/top.sv:1.1-22.10"
+      },
+      "ports": {
+        "input_data": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5 ]
+        },
+        "output_data": {
+          "direction": "output",
+          "bits": [ 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
+        }
+      },
+      "cells": {
+        "$add$designs/1130/top.sv:17$15": {
+          "hide_name": 1,
+          "type": "$add",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000111"
+          },
+          "attributes": {
+            "src": "designs/1130/top.sv:17.38-17.158"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 43, 44, 45, 46, 47, 48 ],
+            "B": [ 49, 50, 51, 52, "0", "0" ],
+            "Y": [ 53, 54, 55, 56, 57, 58, 59 ]
+          }
+        },
+        "$add$designs/1130/top.sv:20$24": {
+          "hide_name": 1,
+          "type": "$add",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000011101",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000101",
+            "Y_WIDTH": "00000000000000000000000000011101"
+          },
+          "attributes": {
+            "src": "designs/1130/top.sv:20.185-20.211"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 60, 61, 62, 63, 57, 58, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59 ],
+            "B": [ 2, 3, 4, 5, "0" ],
+            "Y": [ 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$100": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 93 ],
+            "Y": [ 94 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$102": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 95 ],
+            "Y": [ 96 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$104": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 97 ],
+            "Y": [ 98 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$106": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 99 ],
+            "Y": [ 100 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$108": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 101 ],
+            "Y": [ 102 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$110": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 103 ],
+            "Y": [ 104 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$112": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 105 ],
+            "Y": [ 106 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$114": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 107 ],
+            "Y": [ 108 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$116": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 109 ],
+            "Y": [ 110 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$118": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 111 ],
+            "Y": [ 112 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$120": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 113 ],
+            "Y": [ 114 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$122": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 115 ],
+            "Y": [ 116 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$124": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 117 ],
+            "Y": [ 118 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$126": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 119 ],
+            "Y": [ 120 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$128": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 121 ],
+            "Y": [ 122 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$130": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 123 ],
+            "Y": [ 124 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$132": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 125 ],
+            "Y": [ 126 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$134": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 127 ],
+            "Y": [ 128 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$136": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 129 ],
+            "Y": [ 130 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$157": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 131 ],
+            "Y": [ 132 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$90": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 133 ],
+            "Y": [ 134 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$92": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 135 ],
+            "Y": [ 136 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$94": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 137 ],
+            "Y": [ 138 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$96": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 139 ],
+            "Y": [ 140 ]
+          }
+        },
+        "$auto$opt_expr.cc:250:group_cell_inputs$98": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 141 ],
+            "Y": [ 142 ]
+          }
+        },
+        "$auto$opt_expr.cc:276:group_cell_inputs$139": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5 ],
+            "Y": [ 143, 144, 145, 146 ]
+          }
+        },
+        "$auto$opt_expr.cc:276:group_cell_inputs$145": {
+          "hide_name": 1,
+          "type": "$xor",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 147, 148, 149, 150 ],
+            "B": [ 49, 50, 51, 52 ],
+            "Y": [ 151, 152, 153, 154 ]
+          }
+        },
+        "$auto$opt_expr.cc:276:group_cell_inputs$148": {
+          "hide_name": 1,
+          "type": "$or",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 53, 54, 55, 56 ],
+            "B": [ 49, 50, 51, 52 ],
+            "Y": [ 60, 61, 62, 63 ]
+          }
+        },
+        "$auto$opt_expr.cc:276:group_cell_inputs$151": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 49, 50, 51, 52 ],
+            "Y": [ 155, 156, 157, 158 ]
+          }
+        },
+        "$auto$opt_expr.cc:276:group_cell_inputs$155": {
+          "hide_name": 1,
+          "type": "$xor",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 159, 160, 161, 162 ],
+            "B": [ 155, 156, 157, 158 ],
+            "Y": [ 163, 164, 165, 166 ]
+          }
+        },
+        "$auto$opt_expr.cc:276:group_cell_inputs$54": {
+          "hide_name": 1,
+          "type": "$or",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000011",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000011",
+            "Y_WIDTH": "00000000000000000000000000000011"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 167, 168, 169 ],
+            "B": [ 170, 171, 172 ],
+            "Y": [ 147, 148, 149 ]
+          }
+        },
+        "$auto$opt_expr.cc:276:group_cell_inputs$60": {
+          "hide_name": 1,
+          "type": "$or",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000011",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000011",
+            "Y_WIDTH": "00000000000000000000000000000011"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 170, 171, 172 ],
+            "B": [ 2, 3, 4 ],
+            "Y": [ 173, 174, 175 ]
+          }
+        },
+        "$auto$opt_expr.cc:276:group_cell_inputs$67": {
+          "hide_name": 1,
+          "type": "$and",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 176 ],
+            "B": [ 170 ],
+            "Y": [ 177 ]
+          }
+        },
+        "$auto$opt_expr.cc:276:group_cell_inputs$81": {
+          "hide_name": 1,
+          "type": "$or",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5 ],
+            "B": [ 2, 3, 4, 5 ],
+            "Y": [ 170, 171, 172, 178 ]
+          }
+        },
+        "$auto$opt_expr.cc:276:group_cell_inputs$85": {
+          "hide_name": 1,
+          "type": "$or",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5 ],
+            "B": [ 170, 171, 172, 178 ],
+            "Y": [ 49, 50, 51, 52 ]
+          }
+        },
+        "$ge$designs/1130/top.sv:20$23": {
+          "hide_name": 1,
+          "type": "$ge",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000101",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "designs/1130/top.sv:20.36-20.160"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 179 ],
+            "B": [ 2, 3, 4, 5, "0" ],
+            "Y": [ 180 ]
+          }
+        },
+        "$gt$designs/1130/top.sv:20$19": {
+          "hide_name": 1,
+          "type": "$gt",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000101",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000010001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "designs/1130/top.sv:20.58-20.112"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 173, 174, 175, 178, "0" ],
+            "B": [ 143, 144, 145, 146, "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1" ],
+            "Y": [ 176 ]
+          }
+        },
+        "$gt$designs/1130/top.sv:20$21": {
+          "hide_name": 1,
+          "type": "$gt",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000101",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000101",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "designs/1130/top.sv:20.48-20.133"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 177, "0", "0", "0", "0" ],
+            "B": [ 2, 3, 4, 5, "0" ],
+            "Y": [ 181 ]
+          }
+        },
+        "$lt$designs/1130/top.sv:20$22": {
+          "hide_name": 1,
+          "type": "$lt",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000011",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "designs/1130/top.sv:20.47-20.148"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 181 ],
+            "B": [ 170, 171, 172 ],
+            "Y": [ 179 ]
+          }
+        },
+        "$mul$designs/1130/top.sv:17$11": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000101",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000101"
+          },
+          "attributes": {
+            "src": "designs/1130/top.sv:17.80-17.109"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, "0" ],
+            "B": [ 3, 4, 5, "0" ],
+            "Y": [ 167, 168, 169, 150, 182 ]
+          }
+        },
+        "$mul$designs/1130/top.sv:20$25": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000011101",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000011",
+            "Y_WIDTH": "00000000000000000000000000011101"
+          },
+          "attributes": {
+            "src": "designs/1130/top.sv:20.184-20.226"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92 ],
+            "B": [ 172, 178, "0" ],
+            "Y": [ 159, 160, 161, 162, 131, 133, 135, 137, 139, 141, 93, 95, 97, 99, 101, 103, 105, 107, 109, 111, 113, 115, 117, 119, 121, 123, 125, 127, 129 ]
+          }
+        },
+        "$reduce_bool$designs/1130/top.sv:20$30": {
+          "hide_name": 1,
+          "type": "$reduce_bool",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "designs/1130/top.sv:20.26-20.262"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5 ],
+            "Y": [ 183 ]
+          }
+        },
+        "$sub$designs/1130/top.sv:17$14": {
+          "hide_name": 1,
+          "type": "$sub",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000101",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000101",
+            "Y_WIDTH": "00000000000000000000000000000110"
+          },
+          "attributes": {
+            "src": "designs/1130/top.sv:17.49-17.147"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 151, 152, 153, 154, 182 ],
+            "B": [ 170, 171, 172, 178, "0" ],
+            "Y": [ 43, 44, 45, 46, 47, 48 ]
+          }
+        },
+        "$sub$designs/1130/top.sv:20$28": {
+          "hide_name": 1,
+          "type": "$sub",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000100000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000101",
+            "Y_WIDTH": "00000000000000000000000000100001"
+          },
+          "attributes": {
+            "src": "designs/1130/top.sv:20.166-20.251"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 163, 164, 165, 166, 132, 134, 136, 138, 140, 142, 94, 96, 98, 100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124, 126, 128, 130, "1", "1", "1" ],
+            "B": [ 2, 3, 4, 5, "0" ],
+            "Y": [ 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216 ]
+          }
+        },
+        "$sub$designs/1130/top.sv:20$29": {
+          "hide_name": 1,
+          "type": "$sub",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000100101",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000011101",
+            "Y_WIDTH": "00000000000000000000000000100101"
+          },
+          "attributes": {
+            "src": "designs/1130/top.sv:20.165-20.261"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 216, 216, 216, 216 ],
+            "B": [ 60, 61, 62, 63, 57, 58, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59 ],
+            "Y": [ 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253 ]
+          }
+        },
+        "$ternary$designs/1130/top.sv:20$31": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000100101"
+          },
+          "attributes": {
+            "src": "designs/1130/top.sv:20.26-20.262"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253 ],
+            "B": [ 180, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "S": [ 183 ],
+            "Y": [ 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
+          }
+        }
+      },
+      "netnames": {
+        "$add$designs/1130/top.sv:17$15_Y": {
+          "hide_name": 1,
+          "bits": [ 53, 54, 55, 56, 57, 58, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59 ],
+          "attributes": {
+            "src": "designs/1130/top.sv:17.38-17.158"
+          }
+        },
+        "$add$designs/1130/top.sv:20$24_Y": {
+          "hide_name": 1,
+          "bits": [ 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92 ],
+          "attributes": {
+            "src": "designs/1130/top.sv:20.185-20.211"
+          }
+        },
+        "$and$designs/1130/top.sv:20$20_Y": {
+          "hide_name": 1,
+          "bits": [ 177, "0", "0", "0", "0" ],
+          "attributes": {
+          }
+        },
+        "$auto$opt_expr.cc:205:group_cell_inputs$138": {
+          "hide_name": 1,
+          "bits": [ 143, 144, 145, 146 ],
+          "attributes": {
+          }
+        },
+        "$auto$opt_expr.cc:205:group_cell_inputs$144": {
+          "hide_name": 1,
+          "bits": [ 151, 152, 153, 154 ],
+          "attributes": {
+          }
+        },
+        "$auto$opt_expr.cc:205:group_cell_inputs$146": {
+          "hide_name": 1,
+          "bits": [ 182 ],
+          "attributes": {
+          }
+        },
+        "$auto$opt_expr.cc:205:group_cell_inputs$150": {
+          "hide_name": 1,
+          "bits": [ 155, 156, 157, 158 ],
+          "attributes": {
+          }
+        },
+        "$auto$opt_expr.cc:205:group_cell_inputs$154": {
+          "hide_name": 1,
+          "bits": [ 163, 164, 165, 166 ],
+          "attributes": {
+          }
+        },
+        "$auto$opt_expr.cc:205:group_cell_inputs$156": {
+          "hide_name": 1,
+          "bits": [ 132 ],
+          "attributes": {
+          }
+        },
+        "$auto$opt_expr.cc:205:group_cell_inputs$53": {
+          "hide_name": 1,
+          "bits": [ 147, 148, 149 ],
+          "attributes": {
+          }
+        },
+        "$auto$opt_expr.cc:205:group_cell_inputs$55": {
+          "hide_name": 1,
+          "bits": [ 150, 182 ],
+          "attributes": {
+          }
+        },
+        "$auto$opt_expr.cc:205:group_cell_inputs$59": {
+          "hide_name": 1,
+          "bits": [ 173, 174, 175 ],
+          "attributes": {
+          }
+        },
+        "$auto$opt_expr.cc:205:group_cell_inputs$74": {
+          "hide_name": 1,
+          "bits": [ 163, 164, 165, 166, 132, 134, 136, 138, 140, 142, 94, 96, 98, 100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124, 126, 128, 130 ],
+          "attributes": {
+          }
+        },
+        "$auto$wreduce.cc:514:run$32": {
+          "hide_name": 1,
+          "bits": [ 180, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "designs/1130/top.sv:20.36-20.160"
+          }
+        },
+        "$auto$wreduce.cc:514:run$33": {
+          "hide_name": 1,
+          "bits": [ 181, "0", "0" ],
+          "attributes": {
+            "src": "designs/1130/top.sv:20.48-20.133"
+          }
+        },
+        "$gt$designs/1130/top.sv:20$19_Y": {
+          "hide_name": 1,
+          "bits": [ 176, "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "designs/1130/top.sv:20.58-20.112"
+          }
+        },
+        "$lt$designs/1130/top.sv:20$22_Y": {
+          "hide_name": 1,
+          "bits": [ 179 ],
+          "attributes": {
+            "src": "designs/1130/top.sv:20.47-20.148"
+          }
+        },
+        "$mul$designs/1130/top.sv:17$11_Y": {
+          "hide_name": 1,
+          "bits": [ 167, 168, 169, 150, 182 ],
+          "attributes": {
+            "src": "designs/1130/top.sv:17.80-17.109"
+          }
+        },
+        "$mul$designs/1130/top.sv:20$25_Y": {
+          "hide_name": 1,
+          "bits": [ 159, 160, 161, 162, 131, 133, 135, 137, 139, 141, 93, 95, 97, 99, 101, 103, 105, 107, 109, 111, 113, 115, 117, 119, 121, 123, 125, 127, 129 ],
+          "attributes": {
+            "src": "designs/1130/top.sv:20.184-20.226"
+          }
+        },
+        "$reduce_bool$designs/1130/top.sv:20$30_Y": {
+          "hide_name": 1,
+          "bits": [ 183 ],
+          "attributes": {
+            "src": "designs/1130/top.sv:20.26-20.262"
+          }
+        },
+        "$sub$designs/1130/top.sv:17$14_Y": {
+          "hide_name": 1,
+          "bits": [ 43, 44, 45, 46, 47, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48 ],
+          "attributes": {
+            "src": "designs/1130/top.sv:17.49-17.147"
+          }
+        },
+        "$sub$designs/1130/top.sv:20$28_Y": {
+          "hide_name": 1,
+          "bits": [ 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 216, 216, 216, 216 ],
+          "attributes": {
+            "src": "designs/1130/top.sv:20.166-20.251"
+          }
+        },
+        "$sub$designs/1130/top.sv:20$29_Y": {
+          "hide_name": 1,
+          "bits": [ 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253 ],
+          "attributes": {
+            "src": "designs/1130/top.sv:20.165-20.261"
+          }
+        },
+        "expr_313111": {
+          "hide_name": 0,
+          "bits": [ 60, 61, 62, 63, 57, 58, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59 ],
+          "attributes": {
+          }
+        },
+        "input_data": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+            "src": "designs/1130/top.sv:2.17-2.27"
+          }
+        },
+        "output_data": {
+          "hide_name": 0,
+          "bits": [ 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ],
+          "attributes": {
+            "src": "designs/1130/top.sv:3.19-3.30"
+          }
+        },
+        "temp_2": {
+          "hide_name": 0,
+          "bits": [ 170, 171, 172, 178, "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "designs/1130/top.sv:8.17-8.23"
+          }
+        },
+        "temp_3": {
+          "hide_name": 0,
+          "bits": [ 49, 50, 51, 52, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "designs/1130/top.sv:9.18-9.24"
+          }
+        }
+      }
+    }
+  }
+}
