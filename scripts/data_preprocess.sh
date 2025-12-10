@@ -7,7 +7,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO_ROOT"
 
-for test_case_id in {0..9}; do
+for test_case_id in {1226..2000}; do
   echo "=== Processing test case ${test_case_id} ==="
 
   # 1. Generate RTL

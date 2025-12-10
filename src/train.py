@@ -35,13 +35,17 @@ class TrainingArgs:
     shuffle: bool = True
     batch_size: int = 8
     hidden_dim: int = 32
-    num_layers: int = 3
+    num_layers: int = 4
     dropout: float = 0.2
     bidirectional: bool = True
     device: str = "cpu"
     learning_rate: float = 0.01
-    num_epochs: int = 1000
+    num_epochs: int = 300
     save_dir: str = "./checkpoints"
+    weight_decay: float = 1e-5
+    lr_scheduler_patience: int = 20
+    lr_scheduler_factor: float = 0.8
+    lr_scheduler_mode: str = "min"
 
 
 def train_epoch(
@@ -268,7 +272,7 @@ def main():
         num_layers=args.num_layers,
         out_channels=1,
         dropout=args.dropout,
-        bidirectional=args.bidirectional,  # TODO: depends on target
+        bidirectional=args.bidirectional,
     )
     model = model.to(args.device)
 
@@ -276,13 +280,27 @@ def main():
     print(model)
     print(f"Total parameters: {sum(p.numel() for p in model.parameters())}")
 
-    # Initialize optimizer
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
+    # Initialize optimizer with weight decay
+    optimizer = torch.optim.Adam(
+        model.parameters(), 
+        lr=args.learning_rate,
+        weight_decay=args.weight_decay
+    )
+
+    # Initialize learning rate scheduler
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer,
+        mode=args.lr_scheduler_mode,
+        factor=args.lr_scheduler_factor,
+        patience=args.lr_scheduler_patience
+    )
 
     # Training loop
     print("\n" + "=" * 70)
     print("Training...")
     print("=" * 70)
+    print(f"Weight Decay: {args.weight_decay}")
+    print(f"LR Scheduler: ReduceLROnPlateau (patience={args.lr_scheduler_patience}, factor={args.lr_scheduler_factor})")
 
     train_losses = []
     test_losses = []
@@ -291,13 +309,17 @@ def main():
         train_loss = train_epoch(model, train_loader, optimizer, args.device)
         train_losses.append(train_loss)
 
-        # Evaluate on test set
+        # Evaluate on validation set
         test_loss, _, _ = evaluate(model, val_loader, args.device)
         test_losses.append(test_loss)
 
+        # Update learning rate based on validation loss
+        scheduler.step(test_loss)
+
         if epoch % 10 == 0 or epoch == 1:
+            current_lr = optimizer.param_groups[0]['lr']
             print(
-                f"Epoch {epoch:4d} | Train Loss: {train_loss:.6f} | Test Loss: {test_loss:.6f}"
+                f"Epoch {epoch:4d} | Train Loss: {train_loss:.6f} | Val Loss: {test_loss:.6f} | LR: {current_lr:.6f}"
             )
 
     # Final evaluation and reporting
