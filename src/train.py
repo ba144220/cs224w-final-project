@@ -18,11 +18,12 @@ import matplotlib.pyplot as plt
 
 # Local imports
 from data.load_dataset import MetricTypes, load_dataset, split_data, normalize_data
+from data.preprocessors import topological_sort
 from models.gcn import GCNModel
 
 
 @dataclass
-class TrainingArgs:
+class TrainingArgs: # pylint: disable=too-many-instance-attributes
     """
     Arguments for training the GNN model.
     """
@@ -169,18 +170,18 @@ def print_final_evaluation(
 
 def plot_training_history(
     train_losses: list[float],
-    test_losses: list[float],
+    val_losses: list[float],
     num_epochs: int,
-    save_path: str = "./checkpoints/training_history.png",
+    save_dir: str = "./checkpoints",
 ) -> None:
     """
     Plot and save training history showing train and test losses.
 
     Args:
         train_losses: List of training losses per epoch
-        test_losses: List of test losses per epoch
+        val_losses: List of validation losses per epoch
         num_epochs: Total number of epochs
-        save_path: Path to save the plot (default: ./checkpoints/training_history.png)
+        save_dir: Path to save the plot (default: ./checkpoints)
     """
     plt.figure(figsize=(12, 5))
 
@@ -188,20 +189,20 @@ def plot_training_history(
     plt.subplot(1, 2, 1)
     epochs = range(1, num_epochs + 1)
     plt.plot(epochs, train_losses, label="Train Loss", alpha=0.8)
-    plt.plot(epochs, test_losses, label="Test Loss", alpha=0.8)
+    plt.plot(epochs, val_losses, label="Validation Loss", alpha=0.8)
     plt.xlabel("Epoch")
     plt.ylabel("MSE Loss")
-    plt.title("Training and Test Loss")
+    plt.title("Training and Validation Loss")
     plt.legend()
     plt.grid(True, alpha=0.3)
 
     # Plot 2: Training and Test Loss (log scale)
     plt.subplot(1, 2, 2)
     plt.plot(epochs, train_losses, label="Train Loss", alpha=0.8)
-    plt.plot(epochs, test_losses, label="Test Loss", alpha=0.8)
+    plt.plot(epochs, val_losses, label="Validation Loss", alpha=0.8)
     plt.xlabel("Epoch")
     plt.ylabel("MSE Loss (log scale)")
-    plt.title("Training and Test Loss (Log Scale)")
+    plt.title("Training and Validation Loss (Log Scale)")
     plt.yscale("log")
     plt.legend()
     plt.grid(True, alpha=0.3)
@@ -209,7 +210,7 @@ def plot_training_history(
     plt.tight_layout()
 
     # Save plot
-    plot_path = save_path
+    plot_path = os.path.join(save_dir, "training_history.png")
     os.makedirs(os.path.dirname(plot_path), exist_ok=True)
     plt.savefig(plot_path, dpi=150, bbox_inches="tight")
     print(f"Training history plot saved to {plot_path}")
@@ -250,6 +251,7 @@ def main():
     if args.target_metrics is None:
         args.target_metrics = ["critical_path"]
     dataset = load_dataset(args.design_dir, args.target_metrics)
+    dataset = [topological_sort(sample) for sample in dataset]
     dataset = normalize_data(dataset)
     train_data, val_data, test_data = split_data(
         dataset, args.train_ratio, args.val_ratio, args.shuffle, args.seed
@@ -285,22 +287,23 @@ def main():
     print("=" * 70)
 
     train_losses = []
-    test_losses = []
+    val_losses = []
 
     for epoch in range(1, args.num_epochs + 1):
         train_loss = train_epoch(model, train_loader, optimizer, args.device)
         train_losses.append(train_loss)
 
         # Evaluate on test set
-        test_loss, _, _ = evaluate(model, val_loader, args.device)
-        test_losses.append(test_loss)
+        val_loss, _, _ = evaluate(model, val_loader, args.device)
+        val_losses.append(val_loss)
 
         if epoch % 10 == 0 or epoch == 1:
             print(
-                f"Epoch {epoch:4d} | Train Loss: {train_loss:.6f} | Test Loss: {test_loss:.6f}"
+                f"Epoch {epoch:4d} | Train Loss: {train_loss:.6f} | Validation Loss: {val_loss:.6f}"
             )
 
     # Final evaluation and reporting
+    # Test set
     final_loss, final_preds, final_targets = evaluate(model, test_loader, args.device)
     print_final_evaluation(final_preds, final_targets, final_loss, test_loader)
 
@@ -308,7 +311,7 @@ def main():
     print("\n" + "=" * 70)
     print("Plotting Training History")
     print("=" * 70)
-    plot_training_history(train_losses, test_losses, args.num_epochs)
+    plot_training_history(train_losses, val_losses, args.num_epochs, args.save_dir)
 
     # Save model
     save_model(model, args.save_dir)

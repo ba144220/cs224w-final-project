@@ -7,7 +7,7 @@ target_metrics: ["critical_path"] # ["critical_path", "core_area", "power"]
 batch_size: 8
 hidden_dim: 32
 dropout: 0.2
-num_layers: 10
+num_layers: 3
 bidirectional: False
 device: "cpu"
 learning_rate: 0.001
