@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 
 # Local imports
 from data.load_dataset import MetricTypes, load_dataset, split_data, normalize_data
-from models.gcn import GCNModel
+from models.gcn_tune import GCNModel
 
 
 @dataclass
