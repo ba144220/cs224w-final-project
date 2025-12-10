@@ -4,6 +4,7 @@ Modified to support directed graphs with bidirectional
 edge expansion and specific architectural constraints.
 """
 
+from typing import Any
 import torch
 from torch import nn
 import torch.nn.functional as F
@@ -53,6 +54,7 @@ class GCNLayer(MessagePassing):
         x: torch.Tensor,
         edge_index: torch.Tensor,
         edge_attr: torch.Tensor = None,
+        **kwargs: Any,
     ) -> torch.Tensor:
         """
         Args:

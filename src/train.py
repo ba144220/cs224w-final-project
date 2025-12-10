@@ -75,6 +75,7 @@ def train_epoch(
             data_batch.edge_index,
             edge_attr=data_batch.edge_attr,
             batch=data_batch.batch,
+            depth=data_batch.depth,
         )
         loss = F.mse_loss(out, data_batch.y.view(-1, 1))
         loss.backward()

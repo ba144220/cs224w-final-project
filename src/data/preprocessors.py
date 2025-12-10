@@ -57,11 +57,18 @@ def topological_sort(sample: Data) -> Data:
     if len(topo_order) != num_nodes:
         raise ValueError("Graph has a cycle, topological sort not possible")
 
+    # Compute depth for each node (longest path from any source)
+    depth = torch.zeros(num_nodes, dtype=torch.long)
+    for node in topo_order:
+        for neighbor in adj_list[node]:
+            depth[neighbor] = max(depth[neighbor], depth[node] + 1)
+
     # Create mapping from old index to new index
     old_to_new = {old_idx: new_idx for new_idx, old_idx in enumerate(topo_order)}
 
-    # Reorder node features
+    # Reorder node features and depth
     new_x = sample.x[topo_order]
+    new_depth = depth[topo_order]
 
     # Update edge indices with new node ordering
     new_src = [old_to_new[edge_index[0, i].item()] for i in range(edge_index.size(1))]
@@ -73,6 +80,7 @@ def topological_sort(sample: Data) -> Data:
         x=new_x,
         edge_index=new_edge_index,
         edge_attr=sample.edge_attr,
+        depth=new_depth,
     )
 
     # Preserve other attributes
@@ -94,10 +102,10 @@ def test_topological_sort():
     from data.load_dataset import load_dataset
     from data.load_net import VALID_NODE_TYPES
     dataset = load_dataset(
-        "designs",
+        "examples",
         ["critical_path", "core_area", "power"],
     )
-    for sample in dataset[:2]:
+    for sample in dataset:
         print(sample.x)
         for i in range(sample.x.size(0)):
             print(f"Node {i}: {VALID_NODE_TYPES[sample.x[i].argmax(dim=0)]}")
@@ -106,7 +114,9 @@ def test_topological_sort():
         new_sample = topological_sort(sample)
         print(new_sample.x)
         for i in range(new_sample.x.size(0)):
-            print(f"Node {i}: {VALID_NODE_TYPES[new_sample.x[i].argmax(dim=0)]}")
+            node_type = VALID_NODE_TYPES[new_sample.x[i].argmax(dim=0)]
+            depth = new_sample.depth[i].item()
+            print(f"Node {i}: {node_type}, depth={depth}")
         print(new_sample.edge_index)
         print(new_sample.edge_attr)
         print("-" * 100)
