@@ -13,4 +13,4 @@ device: "cpu"
 learning_rate: 0.001
 num_epochs: 100
 save_dir: "./checkpoints"
-model_name: "gcn"
+model_name: "topo"
