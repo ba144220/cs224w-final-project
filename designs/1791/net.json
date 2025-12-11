@@ -1,0 +1,71 @@
+{
+  "creator": "Yosys 0.60 (git sha1 5bafeb77dc71e054fa331ab9efa613e6fb0a1c49, clang++ 17.0.0 -fPIC -O3)",
+  "modules": {
+    "top": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "designs/1791/top.sv:1.1-40.10"
+      },
+      "ports": {
+        "input_data": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5, 6, 7 ]
+        },
+        "output_data": {
+          "direction": "output",
+          "bits": [ 8, 9, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ]
+        }
+      },
+      "cells": {
+        "$mul$designs/1791/top.sv:31$59": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000111",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "designs/1791/top.sv:31.22-31.46"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 7 ],
+            "B": [ 2, 3, 4, 5 ],
+            "Y": [ 8, 9, 10, 11 ]
+          }
+        }
+      },
+      "netnames": {
+        "input_data": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5, 6, 7 ],
+          "attributes": {
+            "src": "designs/1791/top.sv:2.17-2.27"
+          }
+        },
+        "output_data": {
+          "hide_name": 0,
+          "bits": [ 8, 9, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "designs/1791/top.sv:3.19-3.30"
+          }
+        },
+        "temp_9": {
+          "hide_name": 0,
+          "bits": [ 8, 9, 10, 11 ],
+          "attributes": {
+            "src": "designs/1791/top.sv:15.17-15.23",
+            "unused_bits": "2 3"
+          }
+        }
+      }
+    }
+  }
+}

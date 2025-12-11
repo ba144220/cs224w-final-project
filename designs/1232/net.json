@@ -1,0 +1,88 @@
+{
+  "creator": "Yosys 0.60 (git sha1 5bafeb77dc71e054fa331ab9efa613e6fb0a1c49, clang++ 17.0.0 -fPIC -O3)",
+  "modules": {
+    "top": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "designs/1232/top.sv:1.1-42.10"
+      },
+      "ports": {
+        "input_data": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5, 6, 7 ]
+        },
+        "output_data": {
+          "direction": "output",
+          "bits": [ 8, 9, 10, 11, 12, 13 ]
+        }
+      },
+      "cells": {
+        "$reduce_bool$designs/1232/top.sv:28$2": {
+          "hide_name": 1,
+          "type": "$reduce_bool",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "designs/1232/top.sv:28.21-28.60"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7 ],
+            "Y": [ 14 ]
+          }
+        },
+        "$ternary$designs/1232/top.sv:28$4": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000110"
+          },
+          "attributes": {
+            "src": "designs/1232/top.sv:28.21-28.60"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "1", "0", "0", "0", "0", "0" ],
+            "B": [ 2, 3, 4, 5, 6, 7 ],
+            "S": [ 14 ],
+            "Y": [ 8, 9, 10, 11, 12, 13 ]
+          }
+        }
+      },
+      "netnames": {
+        "$reduce_bool$designs/1232/top.sv:28$2_Y": {
+          "hide_name": 1,
+          "bits": [ 14 ],
+          "attributes": {
+            "src": "designs/1232/top.sv:28.21-28.60"
+          }
+        },
+        "input_data": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5, 6, 7 ],
+          "attributes": {
+            "src": "designs/1232/top.sv:2.17-2.27"
+          }
+        },
+        "output_data": {
+          "hide_name": 0,
+          "bits": [ 8, 9, 10, 11, 12, 13 ],
+          "attributes": {
+            "src": "designs/1232/top.sv:3.18-3.29"
+          }
+        }
+      }
+    }
+  }
+}
