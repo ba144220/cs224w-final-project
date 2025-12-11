@@ -143,17 +143,19 @@ class TopoDPGNN(nn.Module):
     """
     Topological Dynamic Programming GNN model.
     """
-    def __init__(self, in_dim: int, hidden_dim: int, out_dim: int, edge_dim: int = 1, aggr: str = "mean"):
+    def __init__(self, in_dim: int, hidden_dim: int, out_dim: int, edge_dim: int = 1, num_layers: int = 1, aggr: str = "mean"):
         """
         Args:
             in_dim (int): Input dimension.
             hidden_dim (int): Hidden dimension. Defaults to 32.
             out_dim (int): Output dimension. Defaults to 1.
             edge_dim (int): Edge dimension. Defaults to 1.
+            num_layers (int): Number of layers. Defaults to 1.
             aggr (str): Aggregation method. "mean", "sum", "max". Defaults to "mean".
         """
         super().__init__()
-        self.conv = TopoDPConv(in_dim, hidden_dim, edge_dim=edge_dim, aggr=aggr)
+        self.input_conv = TopoDPConv(in_dim, hidden_dim, edge_dim=edge_dim, aggr=aggr)
+        self.convs = nn.ModuleList([TopoDPConv(hidden_dim, hidden_dim, edge_dim=edge_dim, aggr=aggr) for _ in range(num_layers - 1)])
         self.readout = nn.Sequential(
             nn.Linear(hidden_dim, hidden_dim),
             nn.ReLU(),
@@ -183,7 +185,9 @@ class TopoDPGNN(nn.Module):
             torch.Tensor: Output matrix of shape [num_graphs, out_dim].
         """
         # one DAG sweep
-        h = self.conv(x, edge_index, edge_attr, depth)      # [N, hidden_dim]
+        h = self.input_conv(x, edge_index, edge_attr, depth)      # [N, hidden_dim]
+        for conv in self.convs:
+            h = conv(h, edge_index, edge_attr, depth)      # [N, hidden_dim]
 
         # graph-level PPA prediction
         if batch is None:

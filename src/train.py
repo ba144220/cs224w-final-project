@@ -177,7 +177,8 @@ def main():
             hidden_dim=args.hidden_dim,
             out_dim=1,
             edge_dim=1,
-            aggr="mean"
+            aggr="mean",
+            num_layers=args.num_layers,
         )
     else:
         raise ValueError(f"Unknown model name: {args.model_name}")
