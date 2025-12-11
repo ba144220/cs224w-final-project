@@ -18,7 +18,7 @@ from data.load_dataset import MetricTypes, load_dataset, split_data, normalize_d
 from data.preprocessors import topological_sort
 from models.gcn_tune import GCNModel
 from models.topological_dp_gnn import TopoDPGNN
-from utils.training import plot_training_history, print_final_evaluation, save_model
+from utils.training import plot_training_history, print_final_evaluation, save_evaluation_results, save_model
 
 
 @dataclass
@@ -238,6 +238,7 @@ def main():
     # Test set
     final_loss, final_preds, final_targets = evaluate(model, test_loader, args.device)
     print_final_evaluation(final_preds, final_targets, final_loss, test_loader)
+    save_evaluation_results(final_preds, final_targets, final_loss, test_loader, args.save_dir)
 
     # Plot training history
     print("\n" + "=" * 70)

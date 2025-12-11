@@ -7,6 +7,7 @@ import os
 
 # External imports
 import matplotlib.pyplot as plt
+import pandas as pd
 import torch
 from torch_geometric.loader import DataLoader
 
@@ -59,6 +60,16 @@ def plot_training_history(
     print(f"Training history plot saved to {plot_path}")
     plt.close()
 
+    # Save training history as CSV
+    history_df = pd.DataFrame({
+        "epoch": list(epochs),
+        "train_loss": train_losses,
+        "val_loss": val_losses,
+    })
+    csv_path = os.path.join(save_dir, "training_history.csv")
+    history_df.to_csv(csv_path, index=False)
+    print(f"Training history CSV saved to {csv_path}")
+
 
 def print_final_evaluation(
     test_preds: list[float],
@@ -83,9 +94,10 @@ def print_final_evaluation(
     print("\nPredictions vs Ground Truth:")
     print("-" * 50)
     print(
-        f"{'Design ID':<12} {'Predicted (ns)':<18} {'Actual (ns)':<15} {'Error (ns)'}"
+        f"{'Design ID':<12} {'Predicted':<18} {'Actual':<15} {'Error'}"
     )
     print("-" * 50)
+    results = []
     for i, (pred, target) in enumerate(zip(test_preds, test_targets)):
         error = abs(pred - target)
         design_id = (
@@ -93,7 +105,15 @@ def print_final_evaluation(
             if hasattr(test_loader.dataset[i], "design_id")
             else i
         )
-        print(f"{design_id:<12} {pred:<18.4f} {target:<15.4f} {error:.4f}")
+        results.append({
+            "design_id": design_id,
+            "predicted": pred,
+            "actual": target,
+            "error": error,
+        })
+    sorted_results = sorted(results, key=lambda x: x["error"])
+    for result in sorted_results:
+        print(f"{result['design_id']:<12} {result['predicted']:<18.4f} {result['actual']:<15.4f} {result['error']:.4f}")
     print("-" * 50)
 
     # Calculate metrics
@@ -102,6 +122,59 @@ def print_final_evaluation(
     print(f"\nMean Squared Error (MSE): {mse:.6f}")
     print(f"Root Mean Squared Error (RMSE): {mse**0.5:.6f} ns")
     print(f"Mean Absolute Error (MAE): {mae:.6f} ns")
+
+
+def save_evaluation_results(
+    test_preds: list[float],
+    test_targets: list[float],
+    test_loss: float,
+    test_loader: DataLoader,
+    save_dir: str = "./checkpoints",
+) -> None:
+    """
+    Save evaluation results to a CSV file.
+
+    Args:
+        test_preds: List of predicted values
+        test_targets: List of target values
+        test_loss: Test MSE loss
+        test_loader: DataLoader for test data (to get design IDs)
+        save_dir: Directory to save the results (default: ./checkpoints)
+    """
+    os.makedirs(save_dir, exist_ok=True)
+
+    # Build results dataframe
+    results = []
+    for i, (pred, target) in enumerate(zip(test_preds, test_targets)):
+        design_id = (
+            test_loader.dataset[i].design_id
+            if hasattr(test_loader.dataset[i], "design_id")
+            else i
+        )
+        results.append({
+            "design_id": design_id,
+            "predicted": pred,
+            "actual": target,
+            "error": abs(pred - target),
+        })
+
+    results_df = pd.DataFrame(results)
+    results_path = os.path.join(save_dir, "evaluation_results.csv")
+    results_df.to_csv(results_path, index=False)
+
+    # Save summary metrics
+    mse = sum((p - t) ** 2 for p, t in zip(test_preds, test_targets)) / len(test_preds)
+    mae = sum(abs(p - t) for p, t in zip(test_preds, test_targets)) / len(test_preds)
+
+    metrics_df = pd.DataFrame({
+        "metric": ["mse", "rmse", "mae", "test_loss"],
+        "value": [mse, mse ** 0.5, mae, test_loss],
+    })
+    metrics_path = os.path.join(save_dir, "evaluation_metrics.csv")
+    metrics_df.to_csv(metrics_path, index=False)
+
+    print(f"Evaluation results saved to {results_path}")
+    print(f"Evaluation metrics saved to {metrics_path}")
 
 
 def save_model(model: torch.nn.Module, save_dir: str = "./checkpoints") -> None:
