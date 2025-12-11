@@ -1,0 +1,30 @@
+train_ratio: 0.7
+val_ratio: 0.15
+shuffle: True
+seed: 42
+design_dir: "./designs"
+target_metrics: ["critical_path"]
+batch_size: 32
+hidden_dim: 32
+dropout: 0.2
+num_layers: 3
+bidirectional: False
+device: "cpu"
+learning_rate: 0.001
+num_epochs: 200
+save_dir: "./checkpoints/gcn_combined"
+weight_decay: 0.00001  # 1e-5
+lr_scheduler_patience: 20
+lr_scheduler_factor: 0.8
+lr_scheduler_mode: "min"
+model_name: "gcn"
+
+# Strategy 4: Combined Approach
+# Combines multiple techniques for maximum effect
+use_sample_weights: True
+loss_function: "weighted_mse"
+weight_power: 1.5
+use_log_transform: True  # Log transform + weighted loss
+use_stratified_sampling: True  # Also use stratified sampling
+huber_delta: 1.0
+

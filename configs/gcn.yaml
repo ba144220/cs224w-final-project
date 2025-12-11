@@ -3,7 +3,7 @@ val_ratio: 0.15
 shuffle: True
 seed: 42
 design_dir: "./designs"
-target_metrics: ["critical_path"] # ["critical_path", "core_area", "power"]
+target_metrics: ["power"] # ["critical_path", "core_area", "power"]
 batch_size: 32
 hidden_dim: 32
 dropout: 0.2

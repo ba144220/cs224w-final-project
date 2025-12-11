@@ -143,8 +143,13 @@ def build_graph_from_netlist(  # pylint: disable=too-many-locals,too-many-branch
     - edge_attr: edge features (num_edges, 1)
         - width: width of the edge (integer)
     """
-    with open(netlist_path, "r", encoding="utf-8") as f:
-        netlist_json = json.load(f)
+    try:
+        with open(netlist_path, "r", encoding="utf-8") as f:
+            netlist_json = json.load(f)
+    except Exception as e:
+        print(f"Error loading netlist: {e}")
+        print(f"Netlist path: {netlist_path}")
+        return None
 
     cells = netlist_json["modules"]["top"]["cells"]
     input_data = netlist_json["modules"]["top"]["ports"]["input_data"]
@@ -229,7 +234,8 @@ def load_data(
     Load data from a netlist and metrics file.
     """
     data = build_graph_from_netlist(netlist_path)
-
+    if data is None:
+        return None
     if len(target_metrics) == 0:
         return data
     y = torch.zeros(len(target_metrics), dtype=torch.float)  # (num_targets,)
