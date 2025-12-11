@@ -5,6 +5,7 @@ Training script for GNN models to predict PPA.
 # Python imports
 from dataclasses import dataclass
 import sys
+import os
 
 # External imports
 import torch
@@ -192,7 +193,7 @@ def main():
 
     train_losses = []
     val_losses = []
-
+    best_val_loss = float('inf')
     for epoch in range(1, args.num_epochs + 1):
         train_loss = train_epoch(model, train_loader, optimizer, args.device)
         train_losses.append(train_loss)
@@ -201,11 +202,17 @@ def main():
         val_loss, _, _ = evaluate(model, val_loader, args.device)
         val_losses.append(val_loss)
 
-        if epoch % 10 == 0 or epoch == 1:
+        if epoch % 1 == 0 or epoch == 1:
             print(
                 f"Epoch {epoch:4d} | Train Loss: {train_loss:.6f} | Validation Loss: {val_loss:.6f}"
             )
-
+        # Save the best model based on validation loss
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
+            save_model(model, args.save_dir)
+            
+    # Load the best model
+    model.load_state_dict(torch.load(os.path.join(args.save_dir, "best_model.pt")))
     # Final evaluation and reporting
     # Test set
     final_loss, final_preds, final_targets = evaluate(model, test_loader, args.device)

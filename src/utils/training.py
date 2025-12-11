@@ -112,8 +112,7 @@ def save_model(model: torch.nn.Module, save_dir: str = "./checkpoints") -> None:
         model: The model to save
         save_dir: Directory to save the model (default: ./checkpoints)
     """
-    model_path = save_dir
-    os.makedirs(os.path.dirname(model_path), exist_ok=True)
-    save_file = os.path.join(model_path, "gcn_model.pt")
+    os.makedirs(save_dir, exist_ok=True)
+    save_file = os.path.join(save_dir, "best_model.pt")
     torch.save(model.state_dict(), save_file)
-    print(f"\nModel saved to {save_file}")
+    print(f"Model saved to {save_file}")
