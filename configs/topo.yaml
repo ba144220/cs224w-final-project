@@ -3,7 +3,7 @@ val_ratio: 0.15
 shuffle: True
 seed: 42
 design_dir: "./designs"
-target_metrics: ["critical_path"] # ["critical_path", "core_area", "power"]
+target_metrics: ["power"] # ["critical_path", "core_area", "power"]
 batch_size: 32
 hidden_dim: 32
 dropout: 0.2
@@ -12,5 +12,9 @@ bidirectional: False
 device: "cpu"
 learning_rate: 0.001
 num_epochs: 100
-save_dir: "./checkpoints/topo"
+save_dir: "./checkpoints/power/topo"
+weight_decay: 0.00001  # 1e-5
+lr_scheduler_patience: 10
+lr_scheduler_factor: 0.8
+lr_scheduler_mode: "min"
 model_name: "topo"
