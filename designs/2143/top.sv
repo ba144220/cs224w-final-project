@@ -1,0 +1,20 @@
+module top (
+    input [2:0] input_data,
+    output [36:0] output_data
+);
+
+    logic [4:0] temp_0;
+    logic [16:0] temp_1;
+    logic [7:0] temp_2;
+    logic [31:0] temp_3;
+    logic [28:0] temp_4;
+
+    assign temp_0 = (((input_data << input_data) & (~input_data)) + input_data);
+    assign temp_1 = input_data;
+    assign temp_2 = ($unsigned((input_data - temp_1[11:0])) | input_data);
+    assign temp_3 = temp_2;
+    assign temp_4 = ($signed(($signed(($signed(temp_3) >> temp_3)) & temp_2)) + temp_1);
+
+    assign output_data = ($unsigned(((temp_0 | temp_2[7:2]) - temp_0)) ^ temp_0[1:0]);
+
+endmodule

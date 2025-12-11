@@ -1,0 +1,33 @@
+digraph "top" {
+label="top";
+rankdir="LR";
+remincross=true;
+n1 [ shape=octagon, label="input_data", color="black", fontcolor="black"];
+n2 [ shape=octagon, label="output_data", color="black", fontcolor="black"];
+n3 [ shape=diamond, label="temp_0", color="black", fontcolor="black"];
+n4 [ shape=diamond, label="temp_2", color="black", fontcolor="black"];
+c8 [ shape=record, label="{{<p5> A|<p6> B}|$1\n$or|{<p7> Y}}",  ];
+v0 [ label="23'00000000000000000000000" ];
+c9 [ shape=record, label="{{<p5> A|<p6> B}|$8\n$sub|{<p7> Y}}",  ];
+x1 [ shape=record, style=rounded, label="<s2> 23:23 - 29:29 |<s1> 22:4 - 22:4 |<s0> 3:0 - 3:0 ", color="black", fontcolor="black" ];
+c9:p7:e -> x1:w [arrowhead=odiamond, arrowtail=odiamond, dir=both, color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+x2 [ shape=record, style=rounded, label="<s6> 6x 29:29 - 9:4 |<s0> 3:0 - 3:0 ", color="black", fontcolor="black" ];
+x3 [ shape=record, style=rounded, label="<s1> 9:4 - 28:23 |<s0> 3:0 - 3:0 ", color="black", fontcolor="black" ];
+x2:e -> x3:w [arrowhead=odiamond, arrowtail=odiamond, dir=both, color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+v4 [ label="20'00000000000000000000" ];
+x5 [ shape=record, style=rounded, label="<s0> 19:0 - 23:4 ", color="black", fontcolor="black" ];
+n1:e -> c8:p5:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n1:e -> c8:p6:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+x1:s0:e -> n2:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+x5:s0:e -> n2:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n2:e -> x2:s0:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+c8:p7:e -> n3:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n3:e -> c9:p6:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+x1:s1:e -> n4:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+x1:s2:e -> n4:w [color="black", fontcolor="black", label=""];
+x3:s0:e -> n4:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+x3:s1:e -> n4:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n4:e -> x2:s6:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+v0:e -> c9:p5:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+v4:e -> x5:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+}
