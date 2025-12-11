@@ -3,6 +3,7 @@ Topological Dynamic Programming for the GNN model.
 """
 
 
+from typing import Any
 import torch
 from torch import nn
 from torch_geometric.nn import global_mean_pool
@@ -49,6 +50,7 @@ class TopoDPConv(nn.Module):
         x: torch.Tensor,              # [N, F], nodes in *topological order*
         edge_index: torch.Tensor,     # [2, E], directed src -> dst
         edge_attr: torch.Tensor,      # [E, edge_dim], e.g. bit-width
+        depth: torch.Tensor = None,   # [N], depth of each node
     ) -> torch.Tensor:
         """
         Forward pass of the TopoDPConv layer.
@@ -57,6 +59,7 @@ class TopoDPConv(nn.Module):
             x (torch.Tensor): Node feature matrix of shape [num_nodes, in_channels]. The nodes are sorted topologically.
             edge_index (torch.Tensor): Graph connectivity matrix of shape [2, num_edges].
             edge_attr (torch.Tensor): Edge feature matrix of shape [num_edges, edge_dim].
+            depth (torch.Tensor): Depth of each node for parallel processing.
 
         Returns:
             torch.Tensor: Output matrix of shape [num_nodes, hidden_dim].
@@ -68,49 +71,73 @@ class TopoDPConv(nn.Module):
         src = src.to(device)
         dst = dst.to(device)
         edge_attr = edge_attr.to(device)
+        if edge_attr.dim() == 1:
+            edge_attr = edge_attr.unsqueeze(-1)  # [E] -> [E, 1]
 
         # initial node states
         h = self.node_proj(x)         # [N, hidden_dim]
 
-        # build incoming-edge lists per node
-        E = edge_attr.size(0)
-        in_edges = [[] for _ in range(N)]
-        for e_idx in range(E):
-            v = int(dst[e_idx])
-            in_edges[v].append(e_idx)
+        if depth is None:
+            # Default to sequential depth [0, 1, 2, ..., N-1]
+            depth = torch.arange(N, device=device)
 
-        # DP sweep in topo order: 0..N-1 (predecessors have smaller indices)
-        for v in range(N):
-            e_list = in_edges[v]
-            if not e_list:
+        # Depth-parallel processing: process all nodes at each depth level together
+        max_depth = int(depth.max().item())
+
+        for d in range(1, max_depth + 1):  # depth 0 nodes have no incoming edges
+            # Find all nodes at current depth
+            node_mask = (depth == d)
+            nodes_at_depth = node_mask.nonzero(as_tuple=True)[0]  # [num_nodes_at_depth]
+
+            if nodes_at_depth.numel() == 0:
                 continue
 
-            e_idx_tensor = torch.tensor(e_list, device=device, dtype=torch.long)
+            # Find all edges pointing to nodes at this depth
+            edge_mask = node_mask[dst]  # [E], True for edges where dst is at depth d
+            edge_indices = edge_mask.nonzero(as_tuple=True)[0]  # indices of relevant edges
 
-            cur_src = src[e_idx_tensor]          # [E_v]
-            cur_attr = edge_attr[e_idx_tensor]   # [E_v, edge_dim]
-            
-            if cur_attr.dim() == 1:
-                cur_attr = cur_attr.unsqueeze(-1)  # [E_v] -> [E_v, 1]
+            if edge_indices.numel() == 0:
+                continue
 
+            # Get source nodes and edge attributes for these edges
+            cur_src = src[edge_indices]           # [E_d]
+            cur_dst = dst[edge_indices]           # [E_d]
+            cur_attr = edge_attr[edge_indices]    # [E_d, edge_dim]
 
-            msg_input = torch.cat([h[cur_src], cur_attr], dim=-1)  # [E_v, h+edge_dim]
-            msgs = self.msg_mlp(msg_input)                         # [E_v, hidden_dim]
+            # Compute messages for all edges at once
+            msg_input = torch.cat([h[cur_src], cur_attr], dim=-1)  # [E_d, h+edge_dim]
+            msgs = self.msg_mlp(msg_input)                          # [E_d, hidden_dim]
 
+            # Aggregate messages per destination node using scatter
+            # Map dst node indices to local indices (0 to num_nodes_at_depth-1)
+            node_to_local = torch.zeros(N, dtype=torch.long, device=device)
+            node_to_local[nodes_at_depth] = torch.arange(len(nodes_at_depth), device=device)
+            local_dst = node_to_local[cur_dst]  # [E_d]
+
+            num_nodes_d = len(nodes_at_depth)
             if self.aggr == "mean":
-                agg_v = msgs.mean(dim=0, keepdim=True)
+                # Sum messages and count for mean
+                agg = torch.zeros(num_nodes_d, self.hidden_dim, device=device)
+                agg.scatter_add_(0, local_dst.unsqueeze(-1).expand_as(msgs), msgs)
+                counts = torch.zeros(num_nodes_d, device=device)
+                counts.scatter_add_(0, local_dst, torch.ones_like(local_dst, dtype=torch.float))
+                agg = agg / counts.unsqueeze(-1).clamp(min=1)
             elif self.aggr == "sum":
-                agg_v = msgs.sum(dim=0, keepdim=True)
+                agg = torch.zeros(num_nodes_d, self.hidden_dim, device=device)
+                agg.scatter_add_(0, local_dst.unsqueeze(-1).expand_as(msgs), msgs)
             elif self.aggr == "max":
-                agg_v, _ = msgs.max(dim=0, keepdim=True)
+                agg = torch.full((num_nodes_d, self.hidden_dim), float('-inf'), device=device)
+                agg.scatter_reduce_(0, local_dst.unsqueeze(-1).expand_as(msgs), msgs, reduce="amax")
             else:
                 raise ValueError(f"Unknown aggr: {self.aggr}")
 
-            h_v_old = h[v].unsqueeze(0)                             # [1, hidden_dim]
-            h_v_new = self.update_mlp(torch.cat([h_v_old, agg_v], dim=-1))
-            h[v] = h_v_new.squeeze(0)
+            # Update hidden states for all nodes at this depth
+            h_old = h[nodes_at_depth]  # [num_nodes_d, hidden_dim]
+            h_new = self.update_mlp(torch.cat([h_old, agg], dim=-1))  # [num_nodes_d, hidden_dim]
+            h[nodes_at_depth] = h_new
 
         return h
+
 
 class TopoDPGNN(nn.Module):
     """
@@ -139,6 +166,8 @@ class TopoDPGNN(nn.Module):
         edge_index: torch.Tensor,       # [2, E]
         edge_attr: torch.Tensor,        # [E, edge_dim]
         batch: torch.Tensor = None,     # [N], graph id per node
+        depth: torch.Tensor = None,     # [N], depth of each node
+        **kwargs: Any,
     ) -> torch.Tensor:
         """
         Forward pass of the TopoDPGNN model.
@@ -154,7 +183,7 @@ class TopoDPGNN(nn.Module):
             torch.Tensor: Output matrix of shape [num_graphs, out_dim].
         """
         # one DAG sweep
-        h = self.conv(x, edge_index, edge_attr)      # [N, hidden_dim]
+        h = self.conv(x, edge_index, edge_attr, depth)      # [N, hidden_dim]
 
         # graph-level PPA prediction
         if batch is None:
