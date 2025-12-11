@@ -16,7 +16,7 @@ from transformers import HfArgumentParser
 # Local imports
 from data.load_dataset import MetricTypes, load_dataset, split_data, normalize_data
 from data.preprocessors import topological_sort
-from models.gcn import GCNModel
+from models.gcn_tune import GCNModel
 from models.topological_dp_gnn import TopoDPGNN
 from utils.training import plot_training_history, print_final_evaluation, save_model
 
@@ -35,13 +35,17 @@ class TrainingArgs: # pylint: disable=too-many-instance-attributes
     shuffle: bool = True
     batch_size: int = 8
     hidden_dim: int = 32
-    num_layers: int = 3
+    num_layers: int = 4
     dropout: float = 0.2
     bidirectional: bool = True
     device: str = "cpu"
     learning_rate: float = 0.01
-    num_epochs: int = 1000
+    num_epochs: int = 300
     save_dir: str = "./checkpoints"
+    weight_decay: float = 1e-5
+    lr_scheduler_patience: int = 20
+    lr_scheduler_factor: float = 0.8
+    lr_scheduler_mode: str = "min"
     
     model_name: str = "gcn" # "gcn" or "topo"
 
@@ -159,14 +163,14 @@ def main():
     test_loader = DataLoader(test_data, batch_size=args.batch_size, shuffle=False)
 
     if args.model_name == "gcn":
-        model = GCNModel(
-            in_channels=dataset[0].x.shape[1],
-            hidden_channels=args.hidden_dim,
-            num_layers=args.num_layers,
-            out_channels=1,
-            dropout=args.dropout,
-            bidirectional=args.bidirectional,  # TODO: depends on target
-        )
+      model = GCNModel(
+          in_channels=dataset[0].x.shape[1],
+          hidden_channels=args.hidden_dim,
+          num_layers=args.num_layers,
+          out_channels=1,
+          dropout=args.dropout,
+          bidirectional=args.bidirectional,
+      )
     elif args.model_name == "topo":
         model = TopoDPGNN(
             in_dim=dataset[0].x.shape[1],
@@ -183,13 +187,27 @@ def main():
     print(model)
     print(f"Total parameters: {sum(p.numel() for p in model.parameters())}")
 
-    # Initialize optimizer
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
+    # Initialize optimizer with weight decay
+    optimizer = torch.optim.Adam(
+        model.parameters(), 
+        lr=args.learning_rate,
+        weight_decay=args.weight_decay
+    )
+
+    # Initialize learning rate scheduler
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer,
+        mode=args.lr_scheduler_mode,
+        factor=args.lr_scheduler_factor,
+        patience=args.lr_scheduler_patience
+    )
 
     # Training loop
     print("\n" + "=" * 70)
     print("Training...")
     print("=" * 70)
+    print(f"Weight Decay: {args.weight_decay}")
+    print(f"LR Scheduler: ReduceLROnPlateau (patience={args.lr_scheduler_patience}, factor={args.lr_scheduler_factor})")
 
     train_losses = []
     val_losses = []
@@ -202,10 +220,13 @@ def main():
         val_loss, _, _ = evaluate(model, val_loader, args.device)
         val_losses.append(val_loss)
 
-        if epoch % 1 == 0 or epoch == 1:
-            print(
-                f"Epoch {epoch:4d} | Train Loss: {train_loss:.6f} | Validation Loss: {val_loss:.6f}"
-            )
+        # Update learning rate based on validation loss
+        scheduler.step(test_loss)
+
+        current_lr = optimizer.param_groups[0]['lr']
+        print(
+            f"Epoch {epoch:4d} | Train Loss: {train_loss:.6f} | Val Loss: {val_loss:.6f} | LR: {current_lr:.6f}"
+        )
         # Save the best model based on validation loss
         if val_loss < best_val_loss:
             best_val_loss = val_loss
