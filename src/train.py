@@ -5,6 +5,7 @@ Training script for GNN models to predict PPA.
 # Python imports
 from dataclasses import dataclass
 import sys
+import os
 
 # External imports
 import torch
@@ -79,6 +80,7 @@ def train_epoch(
             data_batch.edge_index,
             edge_attr=data_batch.edge_attr,
             batch=data_batch.batch,
+            depth=data_batch.depth,
         )
         loss = F.mse_loss(out, data_batch.y.view(-1, 1))
         loss.backward()
@@ -209,7 +211,7 @@ def main():
 
     train_losses = []
     val_losses = []
-
+    best_val_loss = float('inf')
     for epoch in range(1, args.num_epochs + 1):
         train_loss = train_epoch(model, train_loader, optimizer, args.device)
         train_losses.append(train_loss)
@@ -221,12 +223,17 @@ def main():
         # Update learning rate based on validation loss
         scheduler.step(test_loss)
 
-        if epoch % 10 == 0 or epoch == 1:
-            current_lr = optimizer.param_groups[0]['lr']
-            print(
-                f"Epoch {epoch:4d} | Train Loss: {train_loss:.6f} | Val Loss: {val_loss:.6f} | LR: {current_lr:.6f}"
-            )
-
+        current_lr = optimizer.param_groups[0]['lr']
+        print(
+            f"Epoch {epoch:4d} | Train Loss: {train_loss:.6f} | Val Loss: {val_loss:.6f} | LR: {current_lr:.6f}"
+        )
+        # Save the best model based on validation loss
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
+            save_model(model, args.save_dir)
+            
+    # Load the best model
+    model.load_state_dict(torch.load(os.path.join(args.save_dir, "best_model.pt")))
     # Final evaluation and reporting
     # Test set
     final_loss, final_preds, final_targets = evaluate(model, test_loader, args.device)
