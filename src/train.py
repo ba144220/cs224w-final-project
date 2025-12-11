@@ -221,7 +221,7 @@ def main():
         val_losses.append(val_loss)
 
         # Update learning rate based on validation loss
-        scheduler.step(test_loss)
+        scheduler.step(val_loss)
 
         current_lr = optimizer.param_groups[0]['lr']
         print(

@@ -4,6 +4,7 @@ Modified to support directed graphs with bidirectional
 edge expansion and specific architectural constraints.
 """
 
+from typing import Any
 import torch
 from torch import nn
 import torch.nn.functional as F
@@ -160,6 +161,7 @@ class GCNModel(nn.Module):
         edge_index: torch.Tensor,
         edge_attr: torch.Tensor = None,
         batch: torch.Tensor = None,
+        **kwargs: Any,
     ) -> torch.Tensor:
         """
         Forward pass of the model.
