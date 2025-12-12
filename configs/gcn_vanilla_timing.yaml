@@ -3,7 +3,7 @@ val_ratio: 0.15
 shuffle: True
 seed: 42
 design_dir: "./designs"
-target_metrics: ["power"] # ["critical_path", "core_area", "power"]
+target_metrics: ["critical_path"]
 batch_size: 32
 hidden_dim: 32
 dropout: 0.2
@@ -11,10 +11,19 @@ num_layers: 3
 bidirectional: False
 device: "cpu"
 learning_rate: 0.001
-num_epochs: 200
-save_dir: "./checkpoints/gcn"
+num_epochs: 300
+save_dir: "./checkpoints/gcn_vanilla_timing"
 weight_decay: 0.00001  # 1e-5
 lr_scheduler_patience: 20
 lr_scheduler_factor: 0.8
 lr_scheduler_mode: "min"
 model_name: "gcn"
+aggr: "max"
+
+# Strategy 1: Weighted MSE Loss
+# Weights samples based on target value distribution
+use_sample_weights: False
+loss_function: "mse"
+use_log_transform: False
+use_stratified_sampling: False
+
