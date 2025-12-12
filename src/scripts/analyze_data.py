@@ -73,5 +73,59 @@ def main():
         plt.yscale("log")
     plt.show()
 
+    # ------------------------------------------------------------------
+    # Distributions after log(1 + x) transform and normalization
+    # ------------------------------------------------------------------
+
+    critical_paths_np = np.array(critical_paths)
+    core_areas_np = np.array(core_areas)
+    powers_np = np.array(powers)
+
+    # Apply log(1 + x)
+    critical_paths_log = np.log1p(critical_paths_np)
+    core_areas_log = np.log1p(core_areas_np)
+    powers_log = np.log1p(powers_np)
+
+    # Standardize (z-score) each metric
+    critical_paths_norm = (critical_paths_log - critical_paths_log.mean()) / critical_paths_log.std()
+    core_areas_norm = (core_areas_log - core_areas_log.mean()) / core_areas_log.std()
+    powers_norm = (powers_log - powers_log.mean()) / powers_log.std()
+
+    # Critical Path (log-normalized)
+    mean_cp_n, std_cp_n = np.mean(critical_paths_norm), np.std(critical_paths_norm)
+    plt.hist(critical_paths_norm, bins=100, weights=weights)
+    plt.axvline(mean_cp_n, color='r', linestyle='-', label=f'Mean: {mean_cp_n:.2f}')
+    plt.axvline(mean_cp_n - std_cp_n, color='r', linestyle='--', label=f'Std: {std_cp_n:.2f}')
+    plt.axvline(mean_cp_n + std_cp_n, color='r', linestyle='--')
+    plt.title("Critical Path Distribution (log(1+x), normalized)")
+    plt.xlabel("Normalized log(1 + Critical Path)")
+    plt.ylabel("Percentage (%)")
+    plt.legend()
+    plt.show()
+
+    # Core Area (log-normalized)
+    mean_ca_n, std_ca_n = np.mean(core_areas_norm), np.std(core_areas_norm)
+    plt.hist(core_areas_norm, bins=100, weights=weights)
+    plt.axvline(mean_ca_n, color='r', linestyle='-', label=f'Mean: {mean_ca_n:.2f}')
+    plt.axvline(mean_ca_n - std_ca_n, color='r', linestyle='--', label=f'Std: {std_ca_n:.2f}')
+    plt.axvline(mean_ca_n + std_ca_n, color='r', linestyle='--')
+    plt.title("Core Area Distribution (log(1+x), normalized)")
+    plt.xlabel("Normalized log(1 + Core Area)")
+    plt.ylabel("Percentage (%)")
+    plt.legend()
+    plt.show()
+
+    # Power (log-normalized)
+    mean_pw_n, std_pw_n = np.mean(powers_norm), np.std(powers_norm)
+    plt.hist(powers_norm, bins=100, weights=weights)
+    plt.axvline(mean_pw_n, color='r', linestyle='-', label=f'Mean: {mean_pw_n:.2f}')
+    plt.axvline(mean_pw_n - std_pw_n, color='r', linestyle='--', label=f'Std: {std_pw_n:.2f}')
+    plt.axvline(mean_pw_n + std_pw_n, color='r', linestyle='--')
+    plt.title("Power Distribution (log(1+x), normalized)")
+    plt.xlabel("Normalized log(1 + Power)")
+    plt.ylabel("Percentage (%)")
+    plt.legend()
+    plt.show()
+
 if __name__ == "__main__":
     main()

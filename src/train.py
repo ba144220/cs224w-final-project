@@ -52,6 +52,7 @@ class TrainingArgs: # pylint: disable=too-many-instance-attributes
     lr_scheduler_patience: int = 20
     lr_scheduler_factor: float = 0.8
     lr_scheduler_mode: str = "min"
+    aggr: str = "sum"
     
     model_name: str = "topo" # "gcn" or "topo"
     
@@ -287,6 +288,7 @@ def main():
           out_channels=1,
           dropout=args.dropout,
           bidirectional=args.bidirectional,
+          aggr=args.aggr
       )
     elif args.model_name == "topo":
         model = TopoDPGNN(
@@ -367,7 +369,7 @@ def main():
     # Final evaluation and reporting
     # Test set
     final_loss, final_preds, final_targets = evaluate(model, test_loader, args.device)
-    print_final_evaluation(final_preds, final_targets, final_loss, test_loader)
+    print_final_evaluation(final_preds, final_targets, final_loss, test_loader, args.save_dir)
 
     # Linear regression analysis between predictions and targets
     print("\n" + "=" * 70)

@@ -65,6 +65,7 @@ def print_final_evaluation(
     test_targets: list[float],
     test_loss: float,
     test_loader: DataLoader,
+    save_dir: str = "./checkpoints",
 ) -> None:
     """
     Print final evaluation results including predictions vs ground truth.
@@ -73,6 +74,8 @@ def print_final_evaluation(
         test_preds: List of predicted values
         test_targets: List of target values
         test_loss: Test MSE loss
+        test_loader: Test data loader
+        save_dir: Directory to save the model (default: ./checkpoints)
     """
     print("\n" + "=" * 70)
     print("Final Evaluation")
@@ -103,6 +106,11 @@ def print_final_evaluation(
     print(f"Root Mean Squared Error (RMSE): {mse**0.5:.6f} ns")
     print(f"Mean Absolute Error (MAE): {mae:.6f} ns")
 
+    # Save predictions and targets
+    with open(os.path.join(save_dir, "evaluation.csv"), "w") as f:
+        f.write("MSE,RMSE,MAE\n")
+        f.write(f"{mse:.6f},{mse**0.5:.6f},{mae:.6f}\n")
+    print(f"Evaluation results saved to {os.path.join(save_dir, 'evaluation.csv')}")
 
 def save_model(model: torch.nn.Module, save_dir: str = "./checkpoints") -> None:
     """
