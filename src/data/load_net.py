@@ -11,6 +11,7 @@ from typing import Literal, Union, Optional
 import pandas as pd
 import torch
 from torch_geometric.data import Data
+from utils.constants import MetricTypes
 
 
 # Valid node types for runtime checking
@@ -69,9 +70,6 @@ NodeTypes = Literal[
     "OUTPUT",
     "UNKNOWN",
 ]
-
-
-MetricTypes = Literal["critical_path", "core_area", "power"]
 
 
 @dataclass
@@ -242,11 +240,11 @@ def load_data(
     with open(metrics_path, "r", encoding="utf-8") as f:
         reader = pd.read_csv(f)
         for i, target_metric in enumerate[MetricTypes](target_metrics):
-            if target_metric == "critical_path":
+            if target_metric == MetricTypes.TIMING:
                 y[i] = float(reader["critical_path_ns"].iloc[0])
-            elif target_metric == "core_area":
+            elif target_metric == MetricTypes.AREA:
                 y[i] = float(reader["CoreArea_um^2"].iloc[0])
-            elif target_metric == "power":
+            elif target_metric == MetricTypes.POWER:
                 y[i] = (
                     float(reader["power_typical_internal_uW"].iloc[0])
                     + float(reader["power_typical_switching_uW"].iloc[0])
@@ -265,7 +263,7 @@ def main():
     data = load_data(
         "examples/net.json",
         "examples/metrics.csv",
-        ["critical_path", "core_area", "power"],
+        [MetricTypes.TIMING, MetricTypes.AREA, MetricTypes.POWER],
     )
     print(data.x)
     print(data.edge_index)

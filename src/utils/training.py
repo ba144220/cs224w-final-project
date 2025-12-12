@@ -15,7 +15,6 @@ from torch_geometric.loader import DataLoader
 def plot_training_history(
     train_losses: list[float],
     val_losses: list[float],
-    num_epochs: int,
     save_dir: str = "./checkpoints",
 ) -> None:
     """
@@ -24,14 +23,15 @@ def plot_training_history(
     Args:
         train_losses: List of training losses per epoch
         val_losses: List of validation losses per epoch
-        num_epochs: Total number of epochs
+        num_epochs: Total number of epochs (not used, kept for backward compatibility)
         save_dir: Path to save the plot (default: ./checkpoints)
     """
     plt.figure(figsize=(12, 5))
 
     # Plot 1: Training and Test Loss
     plt.subplot(1, 2, 1)
-    epochs = range(1, num_epochs + 1)
+    # Use actual number of epochs trained (in case of early stopping)
+    epochs = range(1, len(train_losses) + 1)
     plt.plot(epochs, train_losses, label="Train Loss", alpha=0.8)
     plt.plot(epochs, val_losses, label="Validation Loss", alpha=0.8)
     plt.xlabel("Epoch")
@@ -61,11 +61,13 @@ def plot_training_history(
     plt.close()
 
     # Save training history as CSV
-    history_df = pd.DataFrame({
-        "epoch": list(epochs),
-        "train_loss": train_losses,
-        "val_loss": val_losses,
-    })
+    history_df = pd.DataFrame(
+        {
+            "epoch": list(epochs),
+            "train_loss": train_losses,
+            "val_loss": val_losses,
+        }
+    )
     csv_path = os.path.join(save_dir, "training_history.csv")
     history_df.to_csv(csv_path, index=False)
     print(f"Training history CSV saved to {csv_path}")
@@ -91,33 +93,6 @@ def print_final_evaluation(
     print("\n" + "=" * 70)
     print("Final Evaluation")
     print("=" * 70)
-    print(f"Final Test MSE: {test_loss:.6f}")
-    print(f"Final Test RMSE: {test_loss**0.5:.6f} ns")
-
-    print("\nPredictions vs Ground Truth:")
-    print("-" * 50)
-    print(
-        f"{'Design ID':<12} {'Predicted':<18} {'Actual':<15} {'Error'}"
-    )
-    print("-" * 50)
-    results = []
-    for i, (pred, target) in enumerate(zip(test_preds, test_targets)):
-        error = abs(pred - target)
-        design_id = (
-            test_loader.dataset[i].design_id
-            if hasattr(test_loader.dataset[i], "design_id")
-            else i
-        )
-        results.append({
-            "design_id": design_id,
-            "predicted": pred,
-            "actual": target,
-            "error": error,
-        })
-    sorted_results = sorted(results, key=lambda x: x["error"])
-    for result in sorted_results:
-        print(f"{result['design_id']:<12} {result['predicted']:<18.4f} {result['actual']:<15.4f} {result['error']:.4f}")
-    print("-" * 50)
 
     # Calculate metrics
     mse = sum((p - t) ** 2 for p, t in zip(test_preds, test_targets)) / len(test_preds)
@@ -126,11 +101,6 @@ def print_final_evaluation(
     print(f"Root Mean Squared Error (RMSE): {mse**0.5:.6f} ns")
     print(f"Mean Absolute Error (MAE): {mae:.6f} ns")
 
-    # Save predictions and targets
-    with open(os.path.join(save_dir, "evaluation.csv"), "w") as f:
-        f.write("MSE,RMSE,MAE\n")
-        f.write(f"{mse:.6f},{mse**0.5:.6f},{mae:.6f}\n")
-    print(f"Evaluation results saved to {os.path.join(save_dir, 'evaluation.csv')}")
 
 def save_evaluation_results(
     test_preds: list[float],
@@ -159,12 +129,14 @@ def save_evaluation_results(
             if hasattr(test_loader.dataset[i], "design_id")
             else i
         )
-        results.append({
-            "design_id": design_id,
-            "predicted": pred,
-            "actual": target,
-            "error": abs(pred - target),
-        })
+        results.append(
+            {
+                "design_id": design_id,
+                "predicted": pred,
+                "actual": target,
+                "error": abs(pred - target),
+            }
+        )
 
     results_df = pd.DataFrame(results)
     results_path = os.path.join(save_dir, "evaluation_results.csv")
@@ -174,10 +146,12 @@ def save_evaluation_results(
     mse = sum((p - t) ** 2 for p, t in zip(test_preds, test_targets)) / len(test_preds)
     mae = sum(abs(p - t) for p, t in zip(test_preds, test_targets)) / len(test_preds)
 
-    metrics_df = pd.DataFrame({
-        "metric": ["mse", "rmse", "mae", "test_loss"],
-        "value": [mse, mse ** 0.5, mae, test_loss],
-    })
+    metrics_df = pd.DataFrame(
+        {
+            "metric": ["mse", "rmse", "mae", "test_loss"],
+            "value": [mse, mse**0.5, mae, test_loss],
+        }
+    )
     metrics_path = os.path.join(save_dir, "evaluation_metrics.csv")
     metrics_df.to_csv(metrics_path, index=False)
 
