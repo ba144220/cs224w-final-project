@@ -31,20 +31,33 @@ def load_dataset(
             target_metrics,
             design_id=design_id,
         )
+        if data is None:
+            continue
         dataset.append(data)
 
     return dataset
 
 
-def normalize_data(dataset: list[Data]) -> list[Data]:
+def normalize_data(dataset: list[Data], use_log_transform: bool = False) -> list[Data]:
     """
     Normalize the data.
+    
+    Args:
+        dataset: List of Data objects
+        use_log_transform: If True, apply log(1+x) transformation before normalization
     """
-    # Normalize y
+    # Get all target values
     y = torch.stack([data.y for data in dataset], dim=0)
+    
+    # Optional: Apply log transformation to handle skewed distributions
+    if use_log_transform:
+        y = torch.log1p(y)  # log(1+x) to handle zeros
+
     y = (y - y.mean(dim=0)) / y.std(dim=0)
+    
     for data, y_i in zip(dataset, y):
         data.y = y_i
+    
     return dataset
 
 

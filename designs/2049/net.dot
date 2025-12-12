@@ -1,0 +1,28 @@
+digraph "top" {
+label="top";
+rankdir="LR";
+remincross=true;
+n1 [ shape=octagon, label="input_data", color="black", fontcolor="black"];
+n2 [ shape=octagon, label="output_data", color="black", fontcolor="black"];
+c5 [ shape=record, label="{{<p3> A}|$99\n$not|{<p4> Y}}",  ];
+x0 [ shape=record, style=rounded, label="<s0> 3:3 - 0:0 ", color="black", fontcolor="black" ];
+x0:e -> c5:p3:w [arrowhead=odiamond, arrowtail=odiamond, dir=both, color="black", fontcolor="black", label=""];
+x1 [ shape=record, style=rounded, label="<s0> 0:0 - 0:0 ", color="black", fontcolor="black" ];
+c5:p4:e -> x1:w [arrowhead=odiamond, arrowtail=odiamond, dir=both, color="black", fontcolor="black", label=""];
+c7 [ shape=record, label="{{<p3> A|<p6> B}|$97\n$xor|{<p4> Y}}",  ];
+x2 [ shape=record, style=rounded, label="<s0> 4:1 - 3:0 ", color="black", fontcolor="black" ];
+x2:e -> c7:p3:w [arrowhead=odiamond, arrowtail=odiamond, dir=both, color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+x3 [ shape=record, style=rounded, label="<s0> 7:4 - 3:0 ", color="black", fontcolor="black" ];
+x3:e -> c7:p6:w [arrowhead=odiamond, arrowtail=odiamond, dir=both, color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+x4 [ shape=record, style=rounded, label="<s0> 3:0 - 4:1 ", color="black", fontcolor="black" ];
+c7:p4:e -> x4:w [arrowhead=odiamond, arrowtail=odiamond, dir=both, color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+v5 [ label="5'00000" ];
+x6 [ shape=record, style=rounded, label="<s0> 4:0 - 9:5 ", color="black", fontcolor="black" ];
+n1:e -> x0:s0:w [color="black", fontcolor="black", label=""];
+n1:e -> x2:s0:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+n1:e -> x3:s0:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+x1:s0:e -> n2:w [color="black", fontcolor="black", label=""];
+x4:s0:e -> n2:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+x6:s0:e -> n2:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+v5:e -> x6:w [color="black", fontcolor="black", style="setlinewidth(3)", label=""];
+}
