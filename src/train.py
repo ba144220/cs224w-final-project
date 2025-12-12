@@ -52,6 +52,7 @@ class TrainingArgs: # pylint: disable=too-many-instance-attributes
     lr_scheduler_patience: int = 20
     lr_scheduler_factor: float = 0.8
     lr_scheduler_mode: str = "min"
+    aggr: str = "sum"
     
     model_name: str = "topo" # "gcn" or "topo"
     
@@ -287,6 +288,7 @@ def main():
           out_channels=1,
           dropout=args.dropout,
           bidirectional=args.bidirectional,
+          aggr=args.aggr
       )
     elif args.model_name == "topo":
         model = TopoDPGNN(

@@ -3,29 +3,27 @@ val_ratio: 0.15
 shuffle: True
 seed: 42
 design_dir: "./designs"
-target_metrics: ["critical_path"]
-batch_size: 8
+target_metrics: ["core_area"]
+batch_size: 32
 hidden_dim: 32
 dropout: 0.2
-num_layers: 4
-bidirectional: False
+num_layers: 3
+bidirectional: True
 device: "cpu"
 learning_rate: 0.001
-num_epochs: 500
-save_dir: "./checkpoints/gcn_log"
+num_epochs: 300
+save_dir: "./checkpoints/gcn_vanilla_area"
 weight_decay: 0.00001  # 1e-5
 lr_scheduler_patience: 20
 lr_scheduler_factor: 0.8
 lr_scheduler_mode: "min"
 model_name: "gcn"
+aggr: "sum"
 
-# Strategy 2: Log Transformation
-# Applies log(1+x) to targets before normalization
-# Good for right-skewed distributions
+# Strategy 1: Weighted MSE Loss
+# Weights samples based on target value distribution
 use_sample_weights: False
 loss_function: "mse"
-use_log_transform: True
+use_log_transform: False
 use_stratified_sampling: False
-huber_delta: 1.0
-weight_power: 1.0
 
