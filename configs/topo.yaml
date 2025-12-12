@@ -1,0 +1,6 @@
+model_name: "topo"
+aggr: "sum"
+target_metrics: ["area"]
+num_layers: 1
+bidirectional: True
+save_dir: "./checkpoints/topo_test"

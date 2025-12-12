@@ -7,13 +7,17 @@ import torch
 from torch import nn
 from torch_geometric.nn import global_mean_pool
 
+from utils.constants import AggrTypes
+
 
 class TopoDPConv(nn.Module):
     """
     Topological Dynamic Programming Convolutional Layer.
     """
 
-    def __init__(self, in_dim, hidden_dim, edge_dim=1, aggr: str = "mean"):
+    def __init__(
+        self, in_dim, hidden_dim, edge_dim=1, aggr: AggrTypes = AggrTypes.MEAN
+    ):
         """
         Args:
             in_dim (int): Input dimension.
@@ -33,15 +37,11 @@ class TopoDPConv(nn.Module):
         self.msg_mlp = nn.Sequential(
             nn.Linear(hidden_dim + edge_dim, hidden_dim),
             nn.ReLU(),
-            nn.Linear(hidden_dim, hidden_dim),
-            nn.ReLU(),
         )
 
         # update: [h_v_old || agg_msg] -> h_v_new
         self.update_mlp = nn.Sequential(
             nn.Linear(2 * hidden_dim, hidden_dim),
-            nn.ReLU(),
-            nn.Linear(hidden_dim, hidden_dim),
             nn.ReLU(),
         )
 
@@ -119,7 +119,7 @@ class TopoDPConv(nn.Module):
             local_dst = node_to_local[cur_dst]  # [E_d]
 
             num_nodes_d = len(nodes_at_depth)
-            if self.aggr == "mean":
+            if self.aggr == AggrTypes.MEAN:
                 # Sum messages and count for mean
                 agg = torch.zeros(num_nodes_d, self.hidden_dim, device=device)
                 agg.scatter_add_(0, local_dst.unsqueeze(-1).expand_as(msgs), msgs)
@@ -128,10 +128,10 @@ class TopoDPConv(nn.Module):
                     0, local_dst, torch.ones_like(local_dst, dtype=torch.float)
                 )
                 agg = agg / counts.unsqueeze(-1).clamp(min=1)
-            elif self.aggr == "sum":
+            elif self.aggr == AggrTypes.SUM:
                 agg = torch.zeros(num_nodes_d, self.hidden_dim, device=device)
                 agg.scatter_add_(0, local_dst.unsqueeze(-1).expand_as(msgs), msgs)
-            elif self.aggr == "max":
+            elif self.aggr == AggrTypes.MAX:
                 agg = torch.full(
                     (num_nodes_d, self.hidden_dim), float("-inf"), device=device
                 )
@@ -163,7 +163,7 @@ class TopoDPGNN(nn.Module):
         out_dim: int,
         edge_dim: int = 1,
         num_layers: int = 1,
-        aggr: str = "mean",
+        aggr: AggrTypes = AggrTypes.MEAN,
         bidirectional: bool = False,
     ):
         """
@@ -173,10 +173,12 @@ class TopoDPGNN(nn.Module):
             out_dim (int): Output dimension. Defaults to 1.
             edge_dim (int): Edge dimension. Defaults to 1.
             num_layers (int): Number of layers. Defaults to 1.
-            aggr (str): Aggregation method. "mean", "sum", "max". Defaults to "mean".
+            aggr (AggrTypes): Aggregation method. Defaults to AggrTypes.MEAN.
             bidirectional (bool): Whether to expand edges bidirectionally (default False).
         """
         super().__init__()
+        self.bidirectional = bidirectional
+
         self.input_conv = TopoDPConv(
             in_dim,
             hidden_dim,
@@ -203,7 +205,7 @@ class TopoDPGNN(nn.Module):
                 nn.Linear(hidden_dim, out_dim),
             )
             self.input_conv_fanout = TopoDPConv(
-                hidden_dim, hidden_dim, edge_dim=edge_dim, aggr=aggr
+                in_dim, hidden_dim, edge_dim=edge_dim, aggr=aggr
             )
             self.convs_fanout = nn.ModuleList(
                 [
@@ -234,16 +236,37 @@ class TopoDPGNN(nn.Module):
         Returns:
             torch.Tensor: Output matrix of shape [num_graphs, out_dim].
         """
-        # one DAG sweep
-        h = self.input_conv(x, edge_index, edge_attr, depth)  # [N, hidden_dim]
+        # one DAG sweep (fanin direction)
+        h_fanin = self.input_conv(x, edge_index, edge_attr, depth)  # [N, hidden_dim]
         for conv in self.convs:
-            h = conv(h, edge_index, edge_attr, depth)  # [N, hidden_dim]
+            h_fanin = conv(h_fanin, edge_index, edge_attr, depth)  # [N, hidden_dim]
+
+        if self.bidirectional:
+            # Reverse the edge_index for fanout direction (dst -> src becomes src -> dst)
+            edge_index_rev = torch.flip(edge_index, dims=[0])
+
+            # Compute reverse depth for fanout processing
+            if depth is not None:
+                max_depth = int(depth.max().item())
+                depth_rev = max_depth - depth
+            else:
+                depth_rev = None
+
+            # Process in fanout direction
+            h_fanout = self.input_conv_fanout(x, edge_index_rev, edge_attr, depth_rev)
+            for conv in self.convs_fanout:
+                h_fanout = conv(h_fanout, edge_index_rev, edge_attr, depth_rev)
+
+            # Concatenate fanin and fanout representations
+            h = torch.cat([h_fanin, h_fanout], dim=-1)  # [N, hidden_dim * 2]
+        else:
+            h = h_fanin
 
         # graph-level PPA prediction
         if batch is None:
             hg = h.mean(dim=0, keepdim=True)  # single graph
         else:
-            hg = global_mean_pool(h, batch)  # [num_graphs, hidden_dim]
+            hg = global_mean_pool(h, batch)  # [num_graphs, hidden_dim or hidden_dim*2]
 
         out = self.readout(hg)  # [num_graphs, out_dim] or [1, out_dim]
         return out

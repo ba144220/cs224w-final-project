@@ -263,6 +263,8 @@ def main():
         args.loss_function = LossFunctionTypes(args.loss_function)
 
     # Convert target_metrics list
+    if args.target_metrics is None:
+        args.target_metrics = [MetricTypes.AREA]
     if args.target_metrics and not isinstance(args.target_metrics[0], MetricTypes):
         args.target_metrics = [MetricTypes(m) for m in args.target_metrics]
     dataset = load_dataset(args.design_dir, args.target_metrics)
@@ -327,8 +329,9 @@ def main():
             hidden_dim=args.hidden_dim,
             out_dim=1,
             edge_dim=1,
-            aggr=args.aggr.value,
+            aggr=args.aggr,
             num_layers=args.num_layers,
+            bidirectional=args.bidirectional,
         )
     else:
         raise ValueError(f"Unknown model name: {args.model_name}")
